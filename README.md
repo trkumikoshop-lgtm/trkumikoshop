@@ -1,47 +1,43 @@
 
-# ⛩️ TR-KUMIKO | Guía de Lanzamiento y Solución de Errores
+# ⛩️ TR-KUMIKO | Solución Definitiva de Despliegue
 
-Tu web está lista. Si has tenido problemas al subirla a Netlify, sigue estos pasos:
+Si Netlify te da el error `git ref refs/heads/master (o main) does not exist`, sigue estos pasos exactos:
 
-## 🚨 Solución al Error: "Could not find Git ref main"
+## 1. Asegura tu rama en el Terminal
+Cierra cualquier proceso y pega estos comandos uno a uno en la terminal de tu proyecto:
 
-Este error ocurre porque Netlify busca una rama llamada `main`, pero es posible que tu proyecto use `master`.
+```bash
+# 1. Forzar que tu rama local se llame 'main'
+git branch -M main
 
-### Cómo arreglarlo en 1 minuto:
-1. Entra en tu panel de **Netlify**.
-2. Ve a **Site configuration** -> **Build & deploy** -> **Continuous Deployment**.
-3. Busca la sección **Branches** y haz clic en **Edit settings**.
-4. En **Production branch**, cambia `main` por `master`.
-5. Haz clic en **Save** y luego ve a la pestaña **Deploys** y pulsa **Trigger deploy** -> **Deploy site**.
+# 2. Añadir todos los archivos
+git add .
 
----
+# 3. Guardar cambios
+git commit -m "Fix: Forzando rama main para despliegue"
 
-## 🛠️ Pasos para un Despliegue Exitoso
+# 4. Subir a GitHub (cambia TU_URL por la tuya si no la has puesto)
+# git remote add origin https://github.com/USUARIO/REPOSITORIO.git
+git push -u origin main --force
+```
 
-### 1. Haz tu contenido PERMANENTE (Crítico)
-El panel `/admin` guarda los cambios solo en tu navegador actual. Para que sean públicos:
-1. Diseña tu web en `/admin`.
-2. Haz clic en **"COPIAR CONFIGURACIÓN (JSON)"** al final del panel.
-3. Pega ese código en `services/cmsStore.ts`, dentro de la variable `DEFAULT_CONFIG`.
-4. Sube este cambio a tu repositorio de GitHub.
+## 2. Configura Netlify para 'main'
+Ahora que sabemos SEGURO que tu rama se llama `main`:
 
-### 2. Sube a Netlify (Vía GitHub)
-1. Crea un repositorio en GitHub y sube tu código:
-   ```bash
-   git init
-   git add .
-   git commit -m "Primer despliegue TR-KUMIKO"
-   git branch -M main
-   git remote add origin TU_URL_DE_GITHUB
-   git push -u origin main
-   ```
-2. En Netlify: **Add new site** -> **Import from GitHub**.
-3. Selecciona tu repositorio y deja los ajustes por defecto (`npm run build` y carpeta `dist`).
+1. Entra en [Netlify](https://app.netlify.com/).
+2. Ve a tu sitio -> **Site configuration** -> **Build & deploy** -> **Continuous Deployment**.
+3. En la sección **Branches**, haz clic en **Edit settings**.
+4. En **Production branch**, escribe: `main`.
+5. Pulsa **Save**.
+6. Ve a la pestaña **Deploys** y haz clic en el botón **Trigger deploy** -> **Deploy site**.
 
-### 3. Registro en Google (SEO)
-1. Ve a [Google Search Console](https://search.google.com/search-console).
-2. Verifica tu URL de Netlify usando el método de **Etiqueta HTML**.
-3. Pega esa etiqueta en el `<head>` de tu `index.html`.
+## 3. ¿Cómo saber el nombre de mi rama?
+Si entras en tu repositorio de GitHub, verás un botón desplegable a la izquierda que dice "Branch". El nombre que aparezca ahí (normalmente `main`) es el que DEBE estar escrito en la configuración de Netlify.
 
 ---
-*Si el error persiste, asegúrate de que el repositorio en GitHub no sea 'Privado' o que hayas dado permisos a Netlify para acceder a él.*
+
+### Recordatorio: Contenido Permanente
+No olvides que para que tus cambios del panel `/admin` no se borren:
+1. Copia el JSON desde el panel de control de tu web.
+2. Pégalo en el archivo `services/cmsStore.ts`.
+3. Sube el archivo a GitHub (`git add .`, `git commit...`, `git push...`).
