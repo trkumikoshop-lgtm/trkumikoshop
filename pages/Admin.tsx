@@ -6,7 +6,7 @@ import { SiteConfig, Product, BlogPost } from '../types';
 import { 
   Save, Plus, Trash2, RefreshCw, ShoppingBag, Globe, 
   Image as ImageIcon, Tags, X, Check, Lock, ShieldCheck, 
-  BookOpen, User, Mail, Copy, FileJson, Home as HomeIcon, Star, Video, RotateCcw, Settings, AlertTriangle, Loader2
+  BookOpen, User, Mail, Copy, FileJson, Home as HomeIcon, Star, Video, RotateCcw, Settings, AlertTriangle, Loader2, HardDrive
 } from 'lucide-react';
 
 const Admin: React.FC = () => {
@@ -17,16 +17,27 @@ const Admin: React.FC = () => {
   const [isProcessingImage, setIsProcessingImage] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [storageUsage, setStorageUsage] = useState({ used: 0, percent: 0 });
   
   const latestConfigRef = useRef<SiteConfig>(config);
   
   useEffect(() => {
     latestConfigRef.current = config;
+    calculateStorage();
   }, [config]);
+
+  const calculateStorage = () => {
+    const json = JSON.stringify(config);
+    const usedKB = Math.round(json.length / 1024);
+    const limitKB = 4500; // Margen de seguridad sobre los 5MB de LocalStorage
+    setStorageUsage({
+      used: usedKB,
+      percent: Math.min(100, Math.round((usedKB / limitKB) * 100))
+    });
+  };
 
   const [newCatName, setNewCatName] = useState('');
   const [newFamilyInputs, setNewFamilyInputs] = useState<Record<string, string>>({});
-
   const [isAuthenticated, setIsAuthenticated] = useState(sessionStorage.getItem('tr_admin_auth') === 'true');
   const [password, setPassword] = useState('');
 
@@ -64,13 +75,15 @@ const Admin: React.FC = () => {
   }, []);
 
   /**
-   * UTILIDAD DE COMPRESIÓN:
-   * Redimensiona a 1200px máx y comprime JPEG al 70%
+   * COMPRESOR DE IMÁGENES MEJORADO v2 (TR-KUMIKO)
+   * Formato: WebP (más ligero)
+   * Ancho Máx: 1000px
+   * Calidad: 0.6
    */
   const compressImage = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
-      const maxWidth = 1200;
-      const quality = 0.7;
+      const maxWidth = 1000;
+      const quality = 0.6;
       const reader = new FileReader();
       
       reader.readAsDataURL(file);
@@ -83,7 +96,6 @@ const Admin: React.FC = () => {
           let width = img.width;
           let height = img.height;
 
-          // Calcular proporciones
           if (width > maxWidth) {
             height *= maxWidth / width;
             width = maxWidth;
@@ -94,18 +106,23 @@ const Admin: React.FC = () => {
           
           const ctx = canvas.getContext('2d');
           if (!ctx) {
-            reject("No se pudo obtener el contexto del canvas");
+            reject("Error de contexto");
             return;
           }
 
-          // Dibujar y comprimir
           ctx.drawImage(img, 0, 0, width, height);
-          const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+          
+          // Intentar WebP para máxima compresión, caer a JPEG si falla
+          let compressedBase64 = canvas.toDataURL('image/webp', quality);
+          if (compressedBase64.length > 1000000) { // Si aún pesa más de 1MB algo va mal
+             compressedBase64 = canvas.toDataURL('image/jpeg', 0.5);
+          }
+          
           resolve(compressedBase64);
         };
-        img.onerror = () => reject("Error al cargar la imagen");
+        img.onerror = () => reject("Error de carga");
       };
-      reader.onerror = () => reject("Error al leer el archivo");
+      reader.onerror = () => reject("Error de lectura");
     });
   };
 
@@ -146,9 +163,11 @@ const Admin: React.FC = () => {
     const file = files[0];
     
     try {
-      // PROCESAR Y COMPRIMIR ANTES DE SUBIR
       const optimizedBase64 = await compressImage(file);
+      const sizeKB = Math.round(optimizedBase64.length / 1024);
       
+      console.log(`Foto optimizada: ${sizeKB}KB`);
+
       updateConfig(prev => {
         const next = { ...prev };
         if (type === 'product-img') {
@@ -166,7 +185,7 @@ const Admin: React.FC = () => {
       });
     } catch (err) {
       console.error("Error procesando imagen:", err);
-      alert("No se pudo procesar la imagen. Intenta con otro archivo.");
+      alert("No se pudo procesar la imagen.");
     } finally {
       setIsProcessingImage(false);
     }
@@ -194,27 +213,42 @@ const Admin: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100/30 pb-24">
-      {/* Indicador de procesamiento global */}
       {isProcessingImage && (
         <div className="fixed inset-0 z-[200] bg-wood-dark/40 backdrop-blur-sm flex items-center justify-center">
           <div className="bg-white p-8 rounded-sm shadow-2xl flex flex-col items-center gap-4 border-2 border-wood-pale">
             <Loader2 size={40} className="text-orange-800 animate-spin" />
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-wood-dark">Optimizando Imagen...</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-wood-dark">Comprimiendo foto...</p>
           </div>
         </div>
       )}
 
-      <header className="sticky top-0 z-[60] bg-white border-b-4 border-[#EBDCC5] py-6 px-6 md:px-12 flex justify-between items-center shadow-lg">
+      <header className="sticky top-0 z-[60] bg-white border-b-4 border-[#EBDCC5] py-4 px-6 md:px-12 flex flex-wrap justify-between items-center shadow-lg gap-4">
         <div className="flex items-center gap-6">
           <ShieldCheck className="text-[#4A3728]" size={32} />
           <h1 className="text-lg font-serif-jp font-bold text-[#4A3728] uppercase tracking-widest hidden sm:block">Panel de Gestión</h1>
         </div>
+
+        {/* MONITOR DE ALMACENAMIENTO */}
+        <div className="flex flex-col gap-1 w-full max-w-[200px]">
+          <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-gray-500">
+            <span className="flex items-center gap-1"><HardDrive size={10}/> Memoria</span>
+            <span className={storageUsage.percent > 85 ? 'text-red-600' : ''}>{storageUsage.percent}%</span>
+          </div>
+          <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden border border-gray-200">
+            <div 
+              className={`h-full transition-all duration-500 ${storageUsage.percent > 90 ? 'bg-red-600' : storageUsage.percent > 70 ? 'bg-orange-500' : 'bg-green-600'}`} 
+              style={{ width: `${storageUsage.percent}%` }}
+            ></div>
+          </div>
+          <span className="text-[8px] text-gray-400 text-right">{storageUsage.used}KB / 4500KB</span>
+        </div>
+
         <div className="flex items-center gap-4">
           <button onClick={handleLogout} className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-red-600">Salir</button>
           <button 
             onClick={handleSave} 
             disabled={isSaving || isProcessingImage}
-            className={`px-10 py-5 flex items-center gap-4 transition-all text-[12px] tracking-[0.4em] font-black rounded-sm shadow-2xl border-b-8 ${saveSuccess ? 'bg-green-600 text-white border-green-800' : hasChanges ? 'bg-orange-600 text-white border-orange-800 animate-pulse' : 'bg-[#4A3728] text-white border-black'} ${(isSaving || isProcessingImage) ? 'opacity-50 cursor-wait' : ''}`}
+            className={`px-10 py-5 flex items-center gap-4 transition-all text-[12px] tracking-[0.4em] font-black rounded-sm shadow-2xl border-b-8 ${saveSuccess ? 'bg-green-600 text-white border-green-800' : hasChanges ? 'bg-orange-600 text-white border-orange-800' : 'bg-[#4A3728] text-white border-black'} ${(isSaving || isProcessingImage) ? 'opacity-50 cursor-wait' : ''}`}
           >
             {isSaving ? <RefreshCw className="animate-spin" size={20} /> : saveSuccess ? <Check size={20} /> : <Save size={20} />} 
             {isSaving ? 'GUARDANDO...' : saveSuccess ? 'GUARDADO' : 'GUARDAR CAMBIOS'}
@@ -242,7 +276,6 @@ const Admin: React.FC = () => {
         <main className="flex-grow lg:pl-16">
           <div className="max-w-4xl mx-auto space-y-16">
             
-            {/* ESTRUCTURA */}
             {activeTab === 'taxonomies' && (
               <div className="animate-in fade-in duration-500 space-y-12">
                 <h3 className={sectionTitle}><Tags size={28}/> Estructura de Catálogo</h3>
@@ -287,7 +320,6 @@ const Admin: React.FC = () => {
               </div>
             )}
 
-            {/* PRODUCTOS */}
             {activeTab === 'products' && (
               <div className="space-y-12 animate-in fade-in">
                 <div className="flex justify-between items-center border-b-4 border-[#EBDCC5] pb-8">
@@ -345,10 +377,10 @@ const Admin: React.FC = () => {
                               onChange={e => updateConfig(prev => ({ ...prev, products: prev.products.map(pr => pr.id === p.id ? { ...pr, isCustomizable: e.target.checked } : pr) }))}
                               className="w-6 h-6 accent-orange-700 cursor-pointer"
                             />
-                            <label htmlFor={`check-${p.id}`} className="text-[11px] font-black uppercase tracking-widest text-orange-900 cursor-pointer">Admite personalización (Medidas/Patrón)</label>
+                            <label htmlFor={`check-${p.id}`} className="text-[11px] font-black uppercase tracking-widest text-orange-900 cursor-pointer">Admite personalización</label>
                           </div>
                         </div>
-                        <textarea value={p.description} onChange={e => updateConfig(prev => ({ ...prev, products: prev.products.map(pr => pr.id === p.id ? { ...pr, description: e.target.value } : pr) }))} className={`${inputClass} h-32`} placeholder="Escribe aquí los detalles..." />
+                        <textarea value={p.description} onChange={e => updateConfig(prev => ({ ...prev, products: prev.products.map(pr => pr.id === p.id ? { ...pr, description: e.target.value } : pr) }))} className={`${inputClass} h-32`} placeholder="Detalles de la pieza..." />
                       </div>
                     </div>
                   </div>
@@ -356,7 +388,6 @@ const Admin: React.FC = () => {
               </div>
             )}
 
-            {/* PORTADA */}
             {activeTab === 'home' && (
               <div className="animate-in fade-in duration-500">
                 <h3 className={sectionTitle}><HomeIcon size={28}/> Configuración Portada</h3>
@@ -370,7 +401,7 @@ const Admin: React.FC = () => {
                     <textarea value={config.home.subtitle} onChange={e => updateConfig(prev => ({...prev, home: {...prev.home, subtitle: e.target.value}}))} className={`${inputClass} h-24`} />
                   </div>
                   <div className="space-y-4">
-                    <label className={labelClass}>Imagen Hero de Fondo</label>
+                    <label className={labelClass}>Imagen Hero</label>
                     <div className="aspect-video bg-gray-100 border-2 border-[#EBDCC5] overflow-hidden rounded-sm relative group shadow-inner">
                       <img src={config.home.heroImage} className="w-full h-full object-cover" />
                       <input type="file" onChange={e => handleFileUpload(e, '', 'hero-img')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
@@ -380,7 +411,6 @@ const Admin: React.FC = () => {
               </div>
             )}
 
-            {/* BITÁCORA */}
             {activeTab === 'blog' && (
               <div className="animate-in fade-in duration-500 space-y-12">
                 <div className="flex justify-between items-center border-b-4 border-[#EBDCC5] pb-8">
@@ -409,16 +439,15 @@ const Admin: React.FC = () => {
                       </div>
                     </div>
                     <textarea value={post.excerpt} onChange={e => updateConfig(prev => ({ ...prev, blog: prev.blog.map(b => b.id === post.id ? { ...b, excerpt: e.target.value } : b) }))} className={`${inputClass} h-20`} placeholder="Resumen corto..." />
-                    <textarea value={post.content} onChange={e => updateConfig(prev => ({ ...prev, blog: prev.blog.map(b => b.id === post.id ? { ...b, content: e.target.value } : b) }))} className={`${inputClass} h-64`} placeholder="Escribe el artículo aquí..." />
+                    <textarea value={post.content} onChange={e => updateConfig(prev => ({ ...prev, blog: prev.blog.map(b => b.id === post.id ? { ...b, content: e.target.value } : b) }))} className={`${inputClass} h-64`} placeholder="Escribe el artículo..." />
                   </div>
                 ))}
               </div>
             )}
 
-            {/* IDENTIDAD */}
             {activeTab === 'global' && (
               <div className="animate-in fade-in duration-500">
-                <h3 className={sectionTitle}><Globe size={28}/> Identidad de Marca</h3>
+                <h3 className={sectionTitle}><Globe size={28}/> Identidad</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10 bg-white p-12 border-2 border-[#EBDCC5] shadow-md rounded-sm">
                   <div className="space-y-6">
                     <label className={labelClass}>Nombre Comercial</label>
@@ -435,17 +464,16 @@ const Admin: React.FC = () => {
               </div>
             )}
 
-            {/* SOBRE MÍ */}
             {activeTab === 'about' && (
               <div className="animate-in fade-in duration-500">
-                <h3 className={sectionTitle}><User size={28}/> Perfil de Artesano</h3>
+                <h3 className={sectionTitle}><User size={28}/> Perfil</h3>
                 <div className="bg-white p-10 border-2 border-[#EBDCC5] shadow-md space-y-8">
                    <div className="space-y-4">
-                    <label className={labelClass}>Título de Sección</label>
+                    <label className={labelClass}>Título</label>
                     <input value={config.about.title} onChange={e => updateConfig(prev => ({...prev, about: {...prev.about, title: e.target.value}}))} className={inputClass} />
                   </div>
                    <div className="space-y-4">
-                    <label className={labelClass}>Historia / Bio</label>
+                    <label className={labelClass}>Historia</label>
                     <textarea value={config.about.content} onChange={e => updateConfig(prev => ({...prev, about: {...prev.about, content: e.target.value}}))} className={`${inputClass} h-80`} />
                   </div>
                   <div className="space-y-4">
@@ -459,49 +487,43 @@ const Admin: React.FC = () => {
               </div>
             )}
 
-            {/* CONTACTO */}
             {activeTab === 'contact' && (
               <div className="animate-in fade-in duration-500">
-                <h3 className={sectionTitle}><Mail size={28}/> Canales de Contacto</h3>
+                <h3 className={sectionTitle}><Mail size={28}/> Contacto</h3>
                 <div className="bg-white p-12 border-2 border-[#EBDCC5] shadow-md rounded-sm space-y-10">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                     <div className="space-y-6">
-                      <label className={labelClass}>Email Profesional</label>
+                      <label className={labelClass}>Email</label>
                       <input value={config.contact.email} onChange={e => updateConfig(prev => ({...prev, contact: {...prev.contact, email: e.target.value}}))} className={inputClass} />
                     </div>
                     <div className="space-y-6">
-                      <label className={labelClass}>WhatsApp / Teléfono</label>
+                      <label className={labelClass}>WhatsApp</label>
                       <input value={config.contact.phone} onChange={e => updateConfig(prev => ({...prev, contact: {...prev.contact, phone: e.target.value}}))} className={inputClass} />
                     </div>
                   </div>
                   <div className="space-y-6">
-                    <label className={labelClass}>Instagram (Usuario sin @)</label>
+                    <label className={labelClass}>Instagram (Usuario)</label>
                     <input value={config.contact.instagram} onChange={e => updateConfig(prev => ({...prev, contact: {...prev.contact, instagram: e.target.value}}))} className={inputClass} />
-                  </div>
-                  <div className="space-y-6">
-                    <label className={labelClass}>Mensaje de Invitación</label>
-                    <textarea value={config.contact.description} onChange={e => updateConfig(prev => ({...prev, contact: {...prev.contact, description: e.target.value}}))} className={`${inputClass} h-24`} />
                   </div>
                 </div>
               </div>
             )}
 
-            {/* RESPALDO Y PELIGRO */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-10 border-t-4 border-[#EBDCC5]">
                <div className="bg-orange-100 border-4 border-orange-600 p-8 space-y-6 shadow-xl rounded-sm">
                   <h4 className="text-xl font-black uppercase text-[#4A3728] flex items-center gap-3"><FileJson size={24}/> Respaldo JSON</h4>
-                  <p className="text-[9px] text-orange-800 uppercase font-bold">Guarda este código en un archivo de texto como copia de seguridad.</p>
+                  <p className="text-[9px] text-orange-800 uppercase font-bold">Copia este código como seguridad.</p>
                   <button onClick={() => {
                     navigator.clipboard.writeText(JSON.stringify(config, null, 2));
                     setCopySuccess(true);
                     setTimeout(() => setCopySuccess(false), 2000);
                   }} className={`w-full p-6 font-black uppercase text-white border-b-8 transition-all ${copySuccess ? 'bg-green-600 border-green-900' : 'bg-orange-600 border-orange-900 hover:bg-orange-700'}`}>
-                    {copySuccess ? 'COPIADO AL PORTAPAPELES' : 'COPIAR CONFIGURACIÓN'}
+                    {copySuccess ? 'COPIADO' : 'COPIAR CONFIGURACIÓN'}
                   </button>
                </div>
                <div className="bg-red-50 border-4 border-red-200 p-8 space-y-6 shadow-xl rounded-sm">
                   <h4 className="text-xl font-black uppercase text-red-800 flex items-center gap-3"><RotateCcw size={24}/> Zona Crítica</h4>
-                  <p className="text-[9px] text-red-400 uppercase font-bold">Esto borrará todos los cambios y restablecerá la web original.</p>
+                  <p className="text-[9px] text-red-400 uppercase font-bold">Restablecer datos originales.</p>
                   <button onClick={restoreDefaults} className="w-full bg-red-600 border-b-8 border-red-900 p-6 font-black uppercase text-white hover:bg-red-700">
                     RESTAURAR ORIGINALES
                   </button>
