@@ -1,4 +1,3 @@
-
 {
   "name": "tr-kumiko-web",
   "private": true,
@@ -6,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npx tsc && npx vite build && cp sitemap.xml robots.txt dist/",
+    "build": "vite build && cp sitemap.xml robots.txt dist/",
     "preview": "vite preview"
   },
   "dependencies": {
