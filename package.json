@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npx tsc && npx vite build",
+    "build": "npx tsc && npx vite build && cp sitemap.xml robots.txt dist/",
     "preview": "vite preview"
   },
   "dependencies": {
