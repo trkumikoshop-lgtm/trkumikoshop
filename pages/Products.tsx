@@ -127,9 +127,9 @@ const Products: React.FC = () => {
 
       {selectedProduct && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
-          <div className="absolute inset-0 bg-wood-dark/80 backdrop-blur-md" onClick={() => setSelectedProduct(null)}></div>
+          <div className="fixed inset-0 bg-wood-dark/80 backdrop-blur-md" onClick={() => setSelectedProduct(null)}></div>
           
-          <div className="relative w-full max-w-6xl h-full md:h-[85vh] bg-paper flex flex-col md:flex-row shadow-2xl rounded-sm border border-wood-pale overflow-hidden">
+          <div className="relative w-full max-w-6xl bg-paper flex flex-col md:flex-row shadow-2xl rounded-sm border border-wood-pale overflow-hidden max-h-[90vh]">
             <button 
               onClick={() => setSelectedProduct(null)}
               className="absolute top-6 right-6 z-[130] bg-white p-3 rounded-full hover:bg-orange-800 hover:text-white transition-all shadow-xl active:scale-90"
@@ -138,7 +138,7 @@ const Products: React.FC = () => {
             </button>
 
             {/* ÁREA VISUAL (IZQUIERDA) */}
-            <div className="w-full md:w-3/5 h-[50%] md:h-full bg-black relative flex items-center justify-center group/viewer">
+            <div className="w-full md:w-3/5 h-[300px] md:h-auto bg-black relative flex items-center justify-center group/viewer overflow-hidden">
               {viewMode === 'gallery' ? (
                 <div className="w-full h-full flex items-center justify-center relative">
                    <img 
@@ -188,7 +188,7 @@ const Products: React.FC = () => {
             </div>
 
             {/* ÁREA INFORMACIÓN (DERECHA) */}
-            <div className="w-full md:w-2/5 p-8 md:p-14 bg-paper flex flex-col justify-between overflow-y-auto border-l border-wood-pale">
+            <div className="w-full md:w-2/5 p-8 md:p-14 bg-paper flex flex-col justify-between border-l border-wood-pale overflow-y-auto">
               <div>
                 <div className="flex items-center gap-3 mb-6">
                   <span className="text-[10px] uppercase tracking-widest font-black text-white bg-wood-dark px-3 py-1">{selectedProduct.category}</span>
@@ -204,7 +204,6 @@ const Products: React.FC = () => {
 
                 {selectedProduct.isCustomizable && (
                   <div className="bg-orange-50 border-2 border-orange-200 p-4 mb-8 flex items-center gap-4">
-                    {/* Fixed: Star is now imported from lucide-react */}
                     <Star className="text-orange-600 animate-pulse" size={24} />
                     <div>
                       <span className="text-[10px] font-black uppercase tracking-widest text-orange-900 block">Personalizable</span>
