@@ -74,57 +74,60 @@ const Products: React.FC = () => {
   };
 
   return (
-    <div className="py-20 max-w-7xl mx-auto px-4 fade-in">
-      <div className="text-center mb-24">
-        <span className="text-orange-800 text-[10px] font-bold uppercase tracking-[0.5em] mb-4 block">Nuestro Trabajo</span>
-        <h2 className="text-5xl md:text-6xl font-serif-jp font-bold text-wood-dark mb-6 tracking-tight">Piezas Disponibles</h2>
-        <div className="w-16 h-1 bg-wood-dark mx-auto mb-8"></div>
-      </div>
+    <>
+      <div className="py-20 max-w-7xl mx-auto px-4 fade-in">
+        <div className="text-center mb-24">
+          <span className="text-orange-800 text-[10px] font-bold uppercase tracking-[0.5em] mb-4 block">Nuestro Trabajo</span>
+          <h2 className="text-5xl md:text-6xl font-serif-jp font-bold text-wood-dark mb-6 tracking-tight">Piezas Disponibles</h2>
+          <div className="w-16 h-1 bg-wood-dark mx-auto mb-8"></div>
+        </div>
 
-      <div className="flex justify-center mb-20">
-        <div className="flex flex-wrap justify-center gap-3">
-          {categories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setCatFilter(cat)}
-              className={`text-[10px] uppercase tracking-[0.3em] px-8 py-3 border transition-all font-bold rounded-sm shadow-sm ${
-                catFilter === cat ? 'bg-wood-dark text-white border-wood-dark' : 'bg-white text-gray-400 border-wood-pale hover:text-wood-dark'
-              }`}
+        <div className="flex justify-center mb-20">
+          <div className="flex flex-wrap justify-center gap-3">
+            {categories.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setCatFilter(cat)}
+                className={`text-[10px] uppercase tracking-[0.3em] px-8 py-3 border transition-all font-bold rounded-sm shadow-sm ${
+                  catFilter === cat ? 'bg-wood-dark text-white border-wood-dark' : 'bg-white text-gray-400 border-wood-pale hover:text-wood-dark'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20">
+          {filteredProducts.map(product => (
+            <div 
+              key={product.id} 
+              className="group cursor-pointer"
+              onClick={() => handleOpenProduct(product)}
             >
-              {cat}
-            </button>
+              <div className="relative overflow-hidden aspect-[3/4] bg-white border border-wood-pale mb-6 shadow-sm">
+                <img 
+                  src={product.imageUrls[0] || 'https://via.placeholder.com/600x800?text=Sin+Imagen'} 
+                  alt={product.name} 
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute top-4 right-4 bg-orange-800 text-white px-3 py-1 text-[8px] font-black uppercase tracking-[0.2em] border border-orange-900 z-20 shadow-lg">
+                  {product.family}
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex justify-between items-baseline">
+                  <h3 className="text-2xl font-serif-jp text-wood-dark tracking-tight">{product.name}</h3>
+                  <span className="font-serif-jp text-xl text-wood-dark/60">{product.price}€</span>
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20">
-        {filteredProducts.map(product => (
-          <div 
-            key={product.id} 
-            className="group cursor-pointer"
-            onClick={() => handleOpenProduct(product)}
-          >
-            <div className="relative overflow-hidden aspect-[3/4] bg-white border border-wood-pale mb-6 shadow-sm">
-              <img 
-                src={product.imageUrls[0] || 'https://via.placeholder.com/600x800?text=Sin+Imagen'} 
-                alt={product.name} 
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <div className="absolute top-4 right-4 bg-orange-800 text-white px-3 py-1 text-[8px] font-black uppercase tracking-[0.2em] border border-orange-900 z-20 shadow-lg">
-                {product.family}
-              </div>
-            </div>
-            
-            <div className="space-y-3">
-              <div className="flex justify-between items-baseline">
-                <h3 className="text-2xl font-serif-jp text-wood-dark tracking-tight">{product.name}</h3>
-                <span className="font-serif-jp text-xl text-wood-dark/60">{product.price}€</span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
+      {/* MODAL MOVIDO FUERA DEL CONTENEDOR ANIMADO PARA EVITAR CONFLICTOS DE POSICIONAMIENTO */}
       {selectedProduct && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
           <div className="fixed inset-0 bg-wood-dark/80 backdrop-blur-md" onClick={() => setSelectedProduct(null)}></div>
@@ -231,7 +234,7 @@ const Products: React.FC = () => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
