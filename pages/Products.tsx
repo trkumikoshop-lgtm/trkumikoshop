@@ -10,15 +10,28 @@ import {
 const Products: React.FC = () => {
   const [config] = useState(cmsStore.get());
   const [catFilter, setCatFilter] = useState<string>('Todos');
+  const [familyFilter, setFamilyFilter] = useState<string>('Todos');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [currentImgIdx, setCurrentImgIdx] = useState(0);
   const [viewMode, setViewMode] = useState<'gallery' | 'video'>('gallery');
 
   const filteredProducts = config.products.filter(p => {
-    return catFilter === 'Todos' || p.category === catFilter;
+    const matchCat = catFilter === 'Todos' || p.category === catFilter;
+    const matchFam = familyFilter === 'Todos' || p.family === familyFilter;
+    return matchCat && matchFam;
   });
 
   const categories = ['Todos', ...config.categories];
+  
+  // Obtener familias disponibles para la categoría seleccionada
+  const availableFamilies = catFilter !== 'Todos' 
+    ? ['Todos', ...(config.categoryFamilies[catFilter] || [])] 
+    : [];
+
+  const handleCategoryChange = (cat: string) => {
+    setCatFilter(cat);
+    setFamilyFilter('Todos'); // Resetear familia al cambiar categoría
+  };
 
   const handleOpenProduct = (product: Product) => {
     setSelectedProduct(product);
@@ -81,18 +94,19 @@ const Products: React.FC = () => {
   return (
     <>
       <div className="py-20 max-w-7xl mx-auto px-4 fade-in">
-        <div className="text-center mb-24">
+        <div className="text-center mb-16">
           <span className="text-orange-800 text-[10px] font-bold uppercase tracking-[0.5em] mb-4 block">Nuestro Trabajo</span>
           <h2 className="text-5xl md:text-6xl font-serif-jp font-bold text-wood-dark mb-6 tracking-tight">Piezas Disponibles</h2>
           <div className="w-16 h-1 bg-wood-dark mx-auto mb-8"></div>
         </div>
 
-        <div className="flex justify-center mb-20">
+        <div className="flex flex-col items-center gap-6 mb-20">
+          {/* Filtro de Categorías */}
           <div className="flex flex-wrap justify-center gap-3">
             {categories.map(cat => (
               <button
                 key={cat}
-                onClick={() => setCatFilter(cat)}
+                onClick={() => handleCategoryChange(cat)}
                 className={`text-[10px] uppercase tracking-[0.3em] px-8 py-3 border transition-all font-bold rounded-sm shadow-sm ${
                   catFilter === cat ? 'bg-wood-dark text-white border-wood-dark' : 'bg-white text-gray-400 border-wood-pale hover:text-wood-dark'
                 }`}
@@ -101,6 +115,24 @@ const Products: React.FC = () => {
               </button>
             ))}
           </div>
+
+          {/* Filtro de Familias (solo si hay una categoría seleccionada) */}
+          {availableFamilies.length > 1 && (
+            <div className="flex flex-wrap justify-center gap-2 pt-4 border-t border-wood-pale w-full max-w-2xl animate-in slide-in-from-top-2 duration-300">
+              <span className="w-full text-center text-[9px] uppercase tracking-widest text-gray-400 mb-2 font-bold">Filtrar por familia</span>
+              {availableFamilies.map(fam => (
+                <button
+                  key={fam}
+                  onClick={() => setFamilyFilter(fam)}
+                  className={`text-[9px] uppercase tracking-[0.2em] px-5 py-2 border transition-all font-bold rounded-full ${
+                    familyFilter === fam ? 'bg-orange-800 text-white border-orange-800' : 'bg-white text-gray-400 border-gray-200 hover:border-wood-dark hover:text-wood-dark'
+                  }`}
+                >
+                  {fam}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20">
@@ -135,6 +167,18 @@ const Products: React.FC = () => {
             </div>
           ))}
         </div>
+        
+        {filteredProducts.length === 0 && (
+          <div className="py-20 text-center">
+            <p className="text-gray-400 font-playfair italic text-xl">No se han encontrado piezas con estos filtros.</p>
+            <button 
+              onClick={() => handleCategoryChange('Todos')}
+              className="mt-6 text-[10px] uppercase tracking-widest font-black text-wood-dark border-b-2 border-wood-dark pb-1"
+            >
+              Ver todo el catálogo
+            </button>
+          </div>
+        )}
       </div>
 
       {selectedProduct && (
