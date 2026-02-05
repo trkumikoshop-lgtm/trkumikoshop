@@ -6,7 +6,7 @@ import { SiteConfig, Product, BlogPost } from '../types';
 import { 
   Save, Plus, Trash2, RefreshCw, ShoppingBag, Globe, 
   Image as ImageIcon, Tags, X, Check, Lock, ShieldCheck, 
-  BookOpen, User, Mail, Copy, FileJson, Home as HomeIcon, Star, Video, RotateCcw, Settings, AlertTriangle, Loader2, HardDrive
+  BookOpen, User, Mail, Copy, FileJson, Home as HomeIcon, Star, Video, RotateCcw, Settings, AlertTriangle, Loader2, HardDrive, Link as LinkIcon, Upload
 } from 'lucide-react';
 
 const Admin: React.FC = () => {
@@ -19,6 +19,9 @@ const Admin: React.FC = () => {
   const [copySuccess, setCopySuccess] = useState(false);
   const [storageUsage, setStorageUsage] = useState({ used: 0, percent: 0 });
   
+  // Estados para las URLs temporales de entrada
+  const [urlInputs, setUrlInputs] = useState<Record<string, string>>({});
+  
   const latestConfigRef = useRef<SiteConfig>(config);
   
   useEffect(() => {
@@ -29,7 +32,7 @@ const Admin: React.FC = () => {
   const calculateStorage = () => {
     const json = JSON.stringify(config);
     const usedKB = Math.round(json.length / 1024);
-    const limitKB = 4500; // Margen de seguridad sobre los 5MB de LocalStorage
+    const limitKB = 4500; 
     setStorageUsage({
       used: usedKB,
       percent: Math.min(100, Math.round((usedKB / limitKB) * 100))
@@ -74,12 +77,6 @@ const Admin: React.FC = () => {
     });
   }, []);
 
-  /**
-   * COMPRESOR DE IMÁGENES MEJORADO v2 (TR-KUMIKO)
-   * Formato: WebP (más ligero)
-   * Ancho Máx: 1000px
-   * Calidad: 0.6
-   */
   const compressImage = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const maxWidth = 1000;
@@ -111,13 +108,10 @@ const Admin: React.FC = () => {
           }
 
           ctx.drawImage(img, 0, 0, width, height);
-          
-          // Intentar WebP para máxima compresión, caer a JPEG si falla
           let compressedBase64 = canvas.toDataURL('image/webp', quality);
-          if (compressedBase64.length > 1000000) { // Si aún pesa más de 1MB algo va mal
+          if (compressedBase64.length > 1000000) {
              compressedBase64 = canvas.toDataURL('image/jpeg', 0.5);
           }
-          
           resolve(compressedBase64);
         };
         img.onerror = () => reject("Error de carga");
@@ -126,14 +120,20 @@ const Admin: React.FC = () => {
     });
   };
 
+  // Fix: implemented restoreDefaults to clear local storage and reload the application
+  const restoreDefaults = () => {
+    if (window.confirm("¿Estás seguro de que quieres restablecer los valores de fábrica? Se perderán todos los cambios realizados.")) {
+      localStorage.removeItem('tr_kumiko_config');
+      window.location.reload();
+    }
+  };
+
   const handleSave = async () => {
     if (isSaving) return;
     setIsSaving(true);
-    
     try {
       const dataToSave = latestConfigRef.current;
       const result = cmsStore.save(dataToSave);
-      
       if (result.success) {
         setSaveSuccess(true);
         setHasChanges(false);
@@ -141,54 +141,51 @@ const Admin: React.FC = () => {
         alert(`❌ ERROR DE ALMACENAMIENTO:\n\n${result.error}`);
       }
     } catch (err) {
-      console.error("Error en handleSave:", err);
       alert("Error inesperado al intentar guardar.");
     } finally {
       setIsSaving(false);
     }
   };
 
-  const restoreDefaults = () => {
-    if (window.confirm("¿Seguro que quieres borrar todo y volver a los datos de fábrica?")) {
-      localStorage.removeItem('tr_kumiko_config');
-      window.location.reload();
-    }
-  };
-
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, targetId: string, type: string) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-    
     setIsProcessingImage(true);
     const file = files[0];
-    
     try {
       const optimizedBase64 = await compressImage(file);
-      const sizeKB = Math.round(optimizedBase64.length / 1024);
-      
-      console.log(`Foto optimizada: ${sizeKB}KB`);
-
-      updateConfig(prev => {
-        const next = { ...prev };
-        if (type === 'product-img') {
-          next.products = next.products.map(p => p.id === targetId ? { ...p, imageUrls: [...p.imageUrls, optimizedBase64] } : p);
-        } else if (type === 'blog-img') {
-          next.blog = next.blog.map(b => b.id === targetId ? { ...b, imageUrl: optimizedBase64 } : b);
-        } else if (type === 'hero-img') {
-          next.home = { ...next.home, heroImage: optimizedBase64 };
-        } else if (type === 'about-img') {
-          next.about = { ...next.about, image: optimizedBase64 };
-        } else if (type === 'logo-img') {
-          next.logoUrl = optimizedBase64;
-        }
-        return next;
-      });
+      applyImageUpdate(optimizedBase64, targetId, type);
     } catch (err) {
-      console.error("Error procesando imagen:", err);
       alert("No se pudo procesar la imagen.");
     } finally {
       setIsProcessingImage(false);
+      e.target.value = ''; // Reset input
     }
+  };
+
+  const handleUrlUpload = (targetId: string, type: string) => {
+    const url = urlInputs[targetId || type];
+    if (!url || !url.trim()) return;
+    applyImageUpdate(url.trim(), targetId, type);
+    setUrlInputs(prev => ({ ...prev, [targetId || type]: '' }));
+  };
+
+  const applyImageUpdate = (imageData: string, targetId: string, type: string) => {
+    updateConfig(prev => {
+      const next = { ...prev };
+      if (type === 'product-img') {
+        next.products = next.products.map(p => p.id === targetId ? { ...p, imageUrls: [...p.imageUrls, imageData] } : p);
+      } else if (type === 'blog-img') {
+        next.blog = next.blog.map(b => b.id === targetId ? { ...b, imageUrl: imageData } : b);
+      } else if (type === 'hero-img') {
+        next.home = { ...next.home, heroImage: imageData };
+      } else if (type === 'about-img') {
+        next.about = { ...next.about, image: imageData };
+      } else if (type === 'logo-img') {
+        next.logoUrl = imageData;
+      }
+      return next;
+    });
   };
 
   const inputClass = "w-full bg-white border-2 border-[#EBDCC5] p-4 outline-none focus:border-[#4A3728] text-[#4A3728] text-sm transition-all rounded-sm font-medium";
@@ -212,12 +209,12 @@ const Admin: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100/30 pb-24">
+    <div className="min-h-screen bg-gray-100/30 pb-24 font-sans">
       {isProcessingImage && (
         <div className="fixed inset-0 z-[200] bg-wood-dark/40 backdrop-blur-sm flex items-center justify-center">
           <div className="bg-white p-8 rounded-sm shadow-2xl flex flex-col items-center gap-4 border-2 border-wood-pale">
             <Loader2 size={40} className="text-orange-800 animate-spin" />
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-wood-dark">Comprimiendo foto...</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-wood-dark">Procesando imagen...</p>
           </div>
         </div>
       )}
@@ -228,19 +225,14 @@ const Admin: React.FC = () => {
           <h1 className="text-lg font-serif-jp font-bold text-[#4A3728] uppercase tracking-widest hidden sm:block">Panel de Gestión</h1>
         </div>
 
-        {/* MONITOR DE ALMACENAMIENTO */}
         <div className="flex flex-col gap-1 w-full max-w-[200px]">
           <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-gray-500">
             <span className="flex items-center gap-1"><HardDrive size={10}/> Memoria</span>
             <span className={storageUsage.percent > 85 ? 'text-red-600' : ''}>{storageUsage.percent}%</span>
           </div>
           <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden border border-gray-200">
-            <div 
-              className={`h-full transition-all duration-500 ${storageUsage.percent > 90 ? 'bg-red-600' : storageUsage.percent > 70 ? 'bg-orange-500' : 'bg-green-600'}`} 
-              style={{ width: `${storageUsage.percent}%` }}
-            ></div>
+            <div className={`h-full transition-all duration-500 ${storageUsage.percent > 90 ? 'bg-red-600' : storageUsage.percent > 70 ? 'bg-orange-500' : 'bg-green-600'}`} style={{ width: `${storageUsage.percent}%` }}></div>
           </div>
-          <span className="text-[8px] text-gray-400 text-right">{storageUsage.used}KB / 4500KB</span>
         </div>
 
         <div className="flex items-center gap-4">
@@ -248,7 +240,7 @@ const Admin: React.FC = () => {
           <button 
             onClick={handleSave} 
             disabled={isSaving || isProcessingImage}
-            className={`px-10 py-5 flex items-center gap-4 transition-all text-[12px] tracking-[0.4em] font-black rounded-sm shadow-2xl border-b-8 ${saveSuccess ? 'bg-green-600 text-white border-green-800' : hasChanges ? 'bg-orange-600 text-white border-orange-800' : 'bg-[#4A3728] text-white border-black'} ${(isSaving || isProcessingImage) ? 'opacity-50 cursor-wait' : ''}`}
+            className={`px-10 py-5 flex items-center gap-4 transition-all text-[12px] tracking-[0.4em] font-black rounded-sm shadow-2xl border-b-8 ${saveSuccess ? 'bg-green-600 text-white border-green-800' : hasChanges ? 'bg-orange-600 text-white border-orange-800' : 'bg-[#4A3728] text-white border-black'}`}
           >
             {isSaving ? <RefreshCw className="animate-spin" size={20} /> : saveSuccess ? <Check size={20} /> : <Save size={20} />} 
             {isSaving ? 'GUARDANDO...' : saveSuccess ? 'GUARDADO' : 'GUARDAR CAMBIOS'}
@@ -334,17 +326,29 @@ const Admin: React.FC = () => {
                     <button onClick={() => updateConfig(prev => ({ ...prev, products: prev.products.filter(pr => pr.id !== p.id) }))} className="absolute top-8 right-8 text-gray-300 hover:text-red-600"><Trash2 size={24}/></button>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                       <div className="space-y-6">
-                        <label className={labelClass}>Fotografías (Auto-optimizadas)</label>
-                        <div className="grid grid-cols-2 gap-3">
+                        <label className={labelClass}>Fotografías</label>
+                        <div className="grid grid-cols-2 gap-3 mb-4">
                           {p.imageUrls.map((url, idx) => (
                             <div key={idx} className="relative aspect-square border-2 border-[#EBDCC5] overflow-hidden group/img">
                               <img src={url} className="w-full h-full object-cover" />
                               <button onClick={() => updateConfig(prev => ({ ...prev, products: prev.products.map(pr => pr.id === p.id ? { ...pr, imageUrls: pr.imageUrls.filter(u => u !== url) } : pr) }))} className="absolute inset-0 bg-red-600/80 text-white opacity-0 group-hover/img:opacity-100 flex items-center justify-center"><Trash2 size={16}/></button>
                             </div>
                           ))}
-                          <div className="aspect-square border-2 border-dashed border-[#EBDCC5] flex items-center justify-center relative hover:bg-gray-50">
-                            <Plus size={30} className="text-gray-300" />
-                            <input type="file" onChange={e => handleFileUpload(e, p.id, 'product-img')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                        </div>
+                        
+                        <div className="space-y-4 bg-tilo/20 p-4 border border-wood-pale rounded-sm">
+                          <div className="relative">
+                             <button className="w-full bg-wood-dark text-white p-3 flex items-center justify-center gap-2 text-[9px] font-bold uppercase tracking-widest"><Upload size={14}/> Subir Archivo</button>
+                             <input type="file" onChange={e => handleFileUpload(e, p.id, 'product-img')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                          </div>
+                          <div className="flex gap-2">
+                             <input 
+                              value={urlInputs[p.id] || ''} 
+                              onChange={e => setUrlInputs(prev => ({...prev, [p.id]: e.target.value}))}
+                              placeholder="URL de imagen..." 
+                              className="flex-grow p-2 text-xs border border-wood-pale"
+                             />
+                             <button onClick={() => handleUrlUpload(p.id, 'product-img')} className="bg-orange-600 text-white p-2"><LinkIcon size={14}/></button>
                           </div>
                         </div>
                       </div>
@@ -370,13 +374,7 @@ const Admin: React.FC = () => {
                         <div>
                           <label className={labelClass}>Personalización</label>
                           <div className="flex items-center gap-4 bg-orange-50 p-4 border border-orange-200 rounded-sm">
-                            <input 
-                              type="checkbox" 
-                              id={`check-${p.id}`}
-                              checked={p.isCustomizable} 
-                              onChange={e => updateConfig(prev => ({ ...prev, products: prev.products.map(pr => pr.id === p.id ? { ...pr, isCustomizable: e.target.checked } : pr) }))}
-                              className="w-6 h-6 accent-orange-700 cursor-pointer"
-                            />
+                            <input type="checkbox" id={`check-${p.id}`} checked={p.isCustomizable} onChange={e => updateConfig(prev => ({ ...prev, products: prev.products.map(pr => pr.id === p.id ? { ...pr, isCustomizable: e.target.checked } : pr) }))} className="w-6 h-6 accent-orange-700 cursor-pointer" />
                             <label htmlFor={`check-${p.id}`} className="text-[11px] font-black uppercase tracking-widest text-orange-900 cursor-pointer">Admite personalización</label>
                           </div>
                         </div>
@@ -402,9 +400,19 @@ const Admin: React.FC = () => {
                   </div>
                   <div className="space-y-4">
                     <label className={labelClass}>Imagen Hero</label>
-                    <div className="aspect-video bg-gray-100 border-2 border-[#EBDCC5] overflow-hidden rounded-sm relative group shadow-inner">
+                    <div className="aspect-video bg-gray-100 border-2 border-[#EBDCC5] overflow-hidden rounded-sm relative group mb-4">
                       <img src={config.home.heroImage} className="w-full h-full object-cover" />
-                      <input type="file" onChange={e => handleFileUpload(e, '', 'hero-img')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-4 items-end">
+                       <div className="flex-grow w-full">
+                         <label className="text-[9px] font-bold text-gray-400 mb-1 block">PEGAR URL</label>
+                         <input value={urlInputs['hero-img'] || ''} onChange={e => setUrlInputs(prev => ({...prev, 'hero-img': e.target.value}))} className={inputClass} placeholder="https://..." />
+                       </div>
+                       <button onClick={() => handleUrlUpload('', 'hero-img')} className="bg-orange-600 text-white p-4 rounded-sm"><LinkIcon/></button>
+                       <div className="relative">
+                          <button className="bg-wood-dark text-white p-4 rounded-sm flex items-center gap-2 text-[10px] font-bold uppercase"><Upload size={16}/> SUBIR</button>
+                          <input type="file" onChange={e => handleFileUpload(e, '', 'hero-img')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                       </div>
                     </div>
                   </div>
                 </div>
@@ -432,9 +440,16 @@ const Admin: React.FC = () => {
                       </div>
                       <div className="space-y-4">
                         <label className={labelClass}>Imagen Principal</label>
-                        <div className="aspect-video bg-gray-50 border-2 border-dashed overflow-hidden relative group">
+                        <div className="aspect-video bg-gray-50 border-2 border-dashed overflow-hidden relative mb-4">
                           {post.imageUrl && <img src={post.imageUrl} className="w-full h-full object-cover" />}
-                          <input type="file" onChange={e => handleFileUpload(e, post.id, 'blog-img')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                        </div>
+                        <div className="flex gap-2">
+                           <input value={urlInputs[post.id] || ''} onChange={e => setUrlInputs(prev => ({...prev, [post.id]: e.target.value}))} placeholder="URL de imagen..." className="flex-grow p-2 text-xs border border-wood-pale" />
+                           <button onClick={() => handleUrlUpload(post.id, 'blog-img')} className="bg-orange-600 text-white p-2"><LinkIcon size={14}/></button>
+                           <div className="relative">
+                              <button className="bg-wood-dark text-white p-2 rounded-sm"><Upload size={14}/></button>
+                              <input type="file" onChange={e => handleFileUpload(e, post.id, 'blog-img')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                           </div>
                         </div>
                       </div>
                     </div>
@@ -455,9 +470,18 @@ const Admin: React.FC = () => {
                   </div>
                   <div className="space-y-6">
                     <label className={labelClass}>Logo Taller</label>
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-6 mb-4">
                       {config.logoUrl && <img src={config.logoUrl} className="h-24 w-24 object-contain border-2 border-[#EBDCC5] p-2 bg-white" />}
-                      <input type="file" onChange={e => handleFileUpload(e, '', 'logo-img')} className="text-[11px] font-black text-[#4A3728]" accept="image/*" />
+                    </div>
+                    <div className="space-y-3">
+                        <div className="flex gap-2">
+                           <input value={urlInputs['logo-img'] || ''} onChange={e => setUrlInputs(prev => ({...prev, 'logo-img': e.target.value}))} placeholder="URL del logo..." className="flex-grow p-2 text-xs border border-wood-pale" />
+                           <button onClick={() => handleUrlUpload('', 'logo-img')} className="bg-orange-600 text-white p-2"><LinkIcon size={14}/></button>
+                        </div>
+                        <div className="relative">
+                          <button className="w-full bg-wood-dark text-white p-2 text-[10px] uppercase font-bold flex items-center justify-center gap-2"><Upload size={14}/> Subir logo local</button>
+                          <input type="file" onChange={e => handleFileUpload(e, '', 'logo-img')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                        </div>
                     </div>
                   </div>
                 </div>
@@ -478,9 +502,16 @@ const Admin: React.FC = () => {
                   </div>
                   <div className="space-y-4">
                     <label className={labelClass}>Imagen de Perfil</label>
-                    <div className="w-64 aspect-square bg-gray-100 border-2 overflow-hidden relative group shadow-lg">
+                    <div className="w-64 aspect-square bg-gray-100 border-2 overflow-hidden relative mb-4">
                       <img src={config.about.image} className="w-full h-full object-cover" />
-                      <input type="file" onChange={e => handleFileUpload(e, '', 'about-img')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                    </div>
+                    <div className="flex gap-2 max-w-md">
+                       <input value={urlInputs['about-img'] || ''} onChange={e => setUrlInputs(prev => ({...prev, 'about-img': e.target.value}))} placeholder="URL de imagen..." className="flex-grow p-2 text-xs border border-wood-pale" />
+                       <button onClick={() => handleUrlUpload('', 'about-img')} className="bg-orange-600 text-white p-2"><LinkIcon size={14}/></button>
+                       <div className="relative">
+                          <button className="bg-wood-dark text-white p-2 rounded-sm"><Upload size={14}/></button>
+                          <input type="file" onChange={e => handleFileUpload(e, '', 'about-img')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                       </div>
                     </div>
                   </div>
                 </div>
