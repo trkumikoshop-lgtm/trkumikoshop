@@ -52,6 +52,8 @@ const Products: React.FC = () => {
 
   const renderVideoPlayer = (url: string) => {
     if (!url) return <div className="text-white">Video no disponible</div>;
+    
+    // Soporte para YouTube
     const youtubeRegex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const youtubeMatch = url.match(youtubeRegex);
     const youtubeId = (youtubeMatch && youtubeMatch[2].length === 11) ? youtubeMatch[2] : null;
@@ -68,8 +70,11 @@ const Products: React.FC = () => {
       );
     }
 
+    // Fallback para archivos directos
     return (
-      <video src={url} controls autoPlay className="w-full h-full bg-black object-contain" />
+      <video src={url} controls autoPlay className="w-full h-full bg-black object-contain">
+        Tu navegador no soporta el reproductor de video.
+      </video>
     );
   };
 
@@ -114,6 +119,11 @@ const Products: React.FC = () => {
                 <div className="absolute top-4 right-4 bg-orange-800 text-white px-3 py-1 text-[8px] font-black uppercase tracking-[0.2em] border border-orange-900 z-20 shadow-lg">
                   {product.family}
                 </div>
+                {product.videoUrl && (
+                  <div className="absolute bottom-4 left-4 bg-white/80 backdrop-blur-sm p-2 rounded-full">
+                    <Play size={16} className="text-wood-dark fill-wood-dark" />
+                  </div>
+                )}
               </div>
               
               <div className="space-y-3">
@@ -127,7 +137,6 @@ const Products: React.FC = () => {
         </div>
       </div>
 
-      {/* MODAL MOVIDO FUERA DEL CONTENEDOR ANIMADO PARA EVITAR CONFLICTOS DE POSICIONAMIENTO */}
       {selectedProduct && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
           <div className="fixed inset-0 bg-wood-dark/80 backdrop-blur-md" onClick={() => setSelectedProduct(null)}></div>
@@ -184,8 +193,18 @@ const Products: React.FC = () => {
               {/* SELECTOR MODO VISTA */}
               {selectedProduct.videoUrl && (
                 <div className="absolute top-8 left-8 flex gap-2 z-[120]">
-                  <button onClick={() => setViewMode('gallery')} className={`px-5 py-2 rounded-full text-[9px] font-black tracking-widest ${viewMode === 'gallery' ? 'bg-white text-black' : 'bg-black/40 text-white'}`}><Camera size={14}/></button>
-                  <button onClick={() => setViewMode('video')} className={`px-5 py-2 rounded-full text-[9px] font-black tracking-widest ${viewMode === 'video' ? 'bg-orange-600 text-white' : 'bg-black/40 text-white'}`}><Play size={14}/></button>
+                  <button 
+                    onClick={() => setViewMode('gallery')} 
+                    className={`flex items-center gap-2 px-5 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${viewMode === 'gallery' ? 'bg-white text-black shadow-lg' : 'bg-black/40 text-white hover:bg-black/60'}`}
+                  >
+                    <Camera size={14}/> FOTOS
+                  </button>
+                  <button 
+                    onClick={() => setViewMode('video')} 
+                    className={`flex items-center gap-2 px-5 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${viewMode === 'video' ? 'bg-orange-600 text-white shadow-lg' : 'bg-black/40 text-white hover:bg-black/60'}`}
+                  >
+                    <Play size={14}/> VÍDEO
+                  </button>
                 </div>
               )}
             </div>

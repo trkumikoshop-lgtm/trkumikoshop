@@ -120,7 +120,6 @@ const Admin: React.FC = () => {
     });
   };
 
-  // Fix: implemented restoreDefaults to clear local storage and reload the application
   const restoreDefaults = () => {
     if (window.confirm("¿Estás seguro de que quieres restablecer los valores de fábrica? Se perderán todos los cambios realizados.")) {
       localStorage.removeItem('tr_kumiko_config');
@@ -378,6 +377,32 @@ const Admin: React.FC = () => {
                             <label htmlFor={`check-${p.id}`} className="text-[11px] font-black uppercase tracking-widest text-orange-900 cursor-pointer">Admite personalización</label>
                           </div>
                         </div>
+
+                        {/* NUEVO CAMPO PARA VIDEO URL */}
+                        <div className="space-y-4">
+                          <label className={labelClass}>URL de Video (YouTube o MP4)</label>
+                          <div className="flex gap-2">
+                            <div className="relative flex-grow">
+                              <Video className="absolute left-4 top-1/2 -translate-y-1/2 text-wood-dark/40" size={18} />
+                              <input 
+                                value={p.videoUrl || ''} 
+                                onChange={e => updateConfig(prev => ({ ...prev, products: prev.products.map(pr => pr.id === p.id ? { ...pr, videoUrl: e.target.value } : pr) }))} 
+                                className={`${inputClass} pl-12`} 
+                                placeholder="Ej: https://youtube.com/watch?v=..." 
+                              />
+                            </div>
+                            {p.videoUrl && (
+                              <button 
+                                onClick={() => updateConfig(prev => ({ ...prev, products: prev.products.map(pr => pr.id === p.id ? { ...pr, videoUrl: '' } : pr) }))}
+                                className="bg-red-500 text-white p-4 rounded-sm hover:bg-red-700"
+                              >
+                                <X size={20} />
+                              </button>
+                            )}
+                          </div>
+                          <p className="text-[9px] text-gray-400 italic">Soporta enlaces de YouTube o rutas directas a archivos .mp4</p>
+                        </div>
+
                         <textarea value={p.description} onChange={e => updateConfig(prev => ({ ...prev, products: prev.products.map(pr => pr.id === p.id ? { ...pr, description: e.target.value } : pr) }))} className={`${inputClass} h-32`} placeholder="Detalles de la pieza..." />
                       </div>
                     </div>
