@@ -57,25 +57,38 @@ const DEFAULT_CONFIG: SiteConfig = {
     "VARIOS": [
       "POSAVASOS",
       "CARTELES",
-      "casas"
+      "CASAS"
     ]
   },
   "products": [
     {
-      "id": "1770315201665",
-      "name": "Nueva Pieza",
+      "id": "1770401023058",
+      "name": "Cuadro patrón Asa-no-ha",
       "price": 0,
-      "description": "",
+      "description": "Cuadro con patrón Asa-no-ha que significa literalmente \"hoja de cáñamo\".\nEl cáñamo crece rápido, recto, resistente y en terrenos difíciles y por eso simboliza el crecimiento sano, protección y fortaleza.\nPara los japoneses es muy importante este símbolo de protección, llegando a bordarlo en la ropa de los bebes.",
+      "imageUrls": [
+        "https://image2url.com/r2/default/images/1770401103005-209a8a66-c893-4d66-89b2-eca53d7c862e.jpg",
+        "https://image2url.com/r2/default/images/1770401126329-f7d0874c-16dc-443c-b9af-9f42fe2c7f7e.jpg"
+      ],
+      "category": "CARPINTERÍA KUMIKO",
+      "family": "CUADROS",
+      "isCustomizable": true
+    },
+    {
+      "id": "1770315201665",
+      "name": "Casitas Navideñas",
+      "price": 0,
+      "description": "Casas en tres tamaños para recrear un pueblo navideño. Este trabajo se realizó por encargo.\nPrimero se diseñó cada casa a gusto del cliente y una vez pactado el diseño se cortó con láser.\nEl video fue realizado por el cliente que quedó muy satisfecho.",
       "imageUrls": [
         "https://image2url.com/r2/default/images/1770315299318-5f72f912-8c04-493b-9107-53a4102b877f.jpg",
         "https://image2url.com/r2/default/images/1770315327512-e41bcaec-f764-4fd1-9644-a0358caf624a.jpg",
         "https://image2url.com/r2/default/images/1770315348563-c9741e48-8e55-4d7f-9dc8-7e12e9b52a9e.jpg",
-        "https://image2url.com/r2/default/images/1770315364361-638de233-6159-410b-b7e3-8f55894e5c20.jpg",
-        "https://image2url.com/r2/default/videos/1770315393862-baa1fd95-763c-4b75-938c-06d4c3e10d07.mp4"
+        "https://image2url.com/r2/default/images/1770315364361-638de233-6159-410b-b7e3-8f55894e5c20.jpg"
       ],
-      "category": "CARPINTERÍA KUMIKO",
-      "family": "ADORNOS",
-      "isCustomizable": true
+      "category": "VARIOS",
+      "family": "CASAS",
+      "isCustomizable": true,
+      "videoUrl": "https://image2url.com/r2/default/videos/1770315393862-baa1fd95-763c-4b75-938c-06d4c3e10d07.mp4"
     },
     {
       "id": "1770314119463",
@@ -154,9 +167,10 @@ const DEFAULT_CONFIG: SiteConfig = {
       "id": "1769947212449",
       "name": "Salto Interior",
       "price": 40,
-      "description": "Mandala anfibio en madera, con silueta de rana adornada por patrones simétricos que evocan renovación, equilibrio y conexión con la tierra.\nEstá compuesto por cuatro capas de madera de tilo. \nMedidas 39 cm x 37 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
+      "description": "Mandala anfibio en madera, con silueta de rana adornada por patrones simétricos que evocan renovación, equilibrio y conexión con la tierra.\nEstá compuesto por cuatro capas de madera de tilo. \nLa imagen del salón está generada por IA las medidas correctas del mandala son 39 cm x 37 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
       "imageUrls": [
-        "https://image2url.com/r2/default/images/1770311984777-7955076c-865e-4b30-a8c0-0d9298276ded.jpg"
+        "https://image2url.com/r2/default/images/1770311984777-7955076c-865e-4b30-a8c0-0d9298276ded.jpg",
+        "https://image2url.com/r2/default/images/1770401980974-da8342e1-5666-4537-a01c-04c81b62e51b.png"
       ],
       "category": "CORTE LÁSER",
       "family": "MULTICAPA",
@@ -166,9 +180,10 @@ const DEFAULT_CONFIG: SiteConfig = {
       "id": "1769947010191",
       "name": "Flor de Equilibrio",
       "price": 65,
-      "description": "Mandala floral simétrico cortado en madera, con pétalos entrelazados que irradian armonía, delicadeza y profundidad artesanal.\nEstá compuesto por seis capas de madera de tilo. \nMedidas 25 cm x 35 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
+      "description": "Mandala floral simétrico cortado en madera, con pétalos entrelazados que irradian armonía, delicadeza y profundidad artesanal.\nEstá compuesto por seis capas de madera de tilo. \nLa imagen del salón está generada por IA las medidas correctas del mandala son 25 cm x 35 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
       "imageUrls": [
-        "https://image2url.com/r2/default/images/1770312014339-d4cad6d2-e308-4bc9-8227-c9375b42d72d.webp"
+        "https://image2url.com/r2/default/images/1770312014339-d4cad6d2-e308-4bc9-8227-c9375b42d72d.webp",
+        "https://image2url.com/r2/default/images/1770402310328-56677eca-f063-480d-a6fd-6d811923df37.png"
       ],
       "category": "CORTE LÁSER",
       "family": "MULTICAPA",
@@ -178,9 +193,10 @@ const DEFAULT_CONFIG: SiteConfig = {
       "id": "1769946867863",
       "name": "Aliento de Vida",
       "price": 60,
-      "description": "Mandala hexagonal en madera, con mariposa central rodeada de motivos botánicos que celebran la delicadeza, la transformación y la armonía natural.\nEstá compuesto por cinco capas de madera de tilo. \nMedidas 37 cm x 32 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
+      "description": "Mandala hexagonal en madera, con mariposa central rodeada de motivos botánicos que celebran la delicadeza, la transformación y la armonía natural.\nEstá compuesto por cinco capas de madera de tilo. \nLa imagen del salón está generada por IA las medidas correctas del mandala son 37 cm x 32 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
       "imageUrls": [
-        "https://image2url.com/r2/default/images/1770312040429-bcc8ceab-9e8e-4436-bbfe-1fd0af97bc78.jpg"
+        "https://image2url.com/r2/default/images/1770312040429-bcc8ceab-9e8e-4436-bbfe-1fd0af97bc78.jpg",
+        "https://image2url.com/r2/default/images/1770403070739-e96eeecf-7e19-479a-9463-18108997e440.png"
       ],
       "category": "CORTE LÁSER",
       "family": "MULTICAPA",
@@ -190,9 +206,10 @@ const DEFAULT_CONFIG: SiteConfig = {
       "id": "1769946715723",
       "name": "Susurro del Bosque",
       "price": 60,
-      "description": "Mandala en madera con silueta de zorro, adornado con patrones florales y geométricos que evocan astucia, belleza y equilibrio natural.\nEstá compuesto por ocho capas de madera de tilo. \nMedidas 29 cm x 36 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
+      "description": "Mandala en madera con silueta de zorro, adornado con patrones florales y geométricos que evocan astucia, belleza y equilibrio natural.\nEstá compuesto por ocho capas de madera de tilo. \nLa imagen del salón está generada por IA las medidas correctas del mandala son 29 cm x 36 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
       "imageUrls": [
-        "https://image2url.com/r2/default/images/1770312068822-7e1a0695-cad7-4424-ac12-e0a5864728f3.jpg"
+        "https://image2url.com/r2/default/images/1770312068822-7e1a0695-cad7-4424-ac12-e0a5864728f3.jpg",
+        "https://image2url.com/r2/default/images/1770403632393-23b896ef-97d4-4880-b28d-383cee22ac62.png"
       ],
       "category": "CORTE LÁSER",
       "family": "MULTICAPA",
@@ -202,9 +219,10 @@ const DEFAULT_CONFIG: SiteConfig = {
       "id": "1769946517301",
       "name": "Alma Majestuosa",
       "price": 80,
-      "description": "Mandala leonino en madera, con patrones dorados y texturas envolventes que expresan fuerza, nobleza y belleza salvaje.\nEstá compuesto por ocho capas de madera de tilo. \nMedidas 29 cm x 36 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
+      "description": "Mandala leonino en madera, con patrones dorados y texturas envolventes que expresan fuerza, nobleza y belleza salvaje.\nEstá compuesto por ocho capas de madera de tilo. \nLa imagen del salón está generada por IA las medidas correctas del mandala son 29 cm x 36 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
       "imageUrls": [
-        "https://image2url.com/r2/default/images/1770312092883-0d743d60-934d-4c9a-ac0b-b8e3351676a1.jpg"
+        "https://image2url.com/r2/default/images/1770312092883-0d743d60-934d-4c9a-ac0b-b8e3351676a1.jpg",
+        "https://image2url.com/r2/default/images/1770403904472-644e9843-7c53-4ee1-a99b-2b53296bf91d.png"
       ],
       "category": "CORTE LÁSER",
       "family": "MULTICAPA",
@@ -214,9 +232,10 @@ const DEFAULT_CONFIG: SiteConfig = {
       "id": "1769946354740",
       "name": "Flor del Despertar",
       "price": 60,
-      "description": "Mandala circular en madera, con flores de loto entrelazadas que irradian pureza, equilibrio y profundidad espiritual.\nEstá compuesto por cinco capas de madera de tilo. \nMedidas 35 cm x 37 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
+      "description": "Mandala circular en madera, con flores de loto entrelazadas que irradian pureza, equilibrio y profundidad espiritual.\nEstá compuesto por cinco capas de madera de tilo. \nLa imagen del salón está generada por IA las medidas correctas del mandala son 35 cm x 37 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
       "imageUrls": [
-        "https://image2url.com/r2/default/images/1770312122753-a7feed20-3113-4957-94ff-57fc4438fbc4.webp"
+        "https://image2url.com/r2/default/images/1770312122753-a7feed20-3113-4957-94ff-57fc4438fbc4.webp",
+        "https://image2url.com/r2/default/images/1770404352094-fd7d0cd7-8a36-4428-9065-ff7031017f65.png"
       ],
       "category": "CORTE LÁSER",
       "family": "MULTICAPA",
@@ -228,7 +247,8 @@ const DEFAULT_CONFIG: SiteConfig = {
       "price": 90,
       "description": "Mandala náutico en madera, con timón floral que fusiona dirección y belleza natural en una pieza armoniosa.\nEstá compuesto por ocho capas de madera de tilo. \nMedidas 37 cm x 37 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
       "imageUrls": [
-        "https://image2url.com/r2/default/images/1770312154277-af309169-c17f-43f0-916f-bf6e24922ef4.jpg"
+        "https://image2url.com/r2/default/images/1770312154277-af309169-c17f-43f0-916f-bf6e24922ef4.jpg",
+        "https://image2url.com/r2/default/images/1770404786087-e640741f-a199-45bb-8846-6e9bb81cb84f.png"
       ],
       "category": "CORTE LÁSER",
       "family": "MULTICAPA",
