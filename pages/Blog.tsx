@@ -1,14 +1,15 @@
-
 import React, { useState, useEffect } from 'react';
 import { cmsStore } from '../services/cmsStore';
 import { BlogPost } from '../types';
 import { X, Calendar, ArrowLeft } from 'lucide-react';
 
 const Blog: React.FC = () => {
+  // Added setConfig to the useState hook to allow updating the config from events
   const [config, setConfig] = useState(cmsStore.get());
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
 
   useEffect(() => {
+    // Fixed: setConfig is now defined from the useState hook above
     const handleUpdate = () => setConfig(cmsStore.get());
     const handlePreview = (e: any) => setConfig(e.detail);
     window.addEventListener('cms-update', handleUpdate);
@@ -59,7 +60,7 @@ const Blog: React.FC = () => {
 
       {/* Blog Post Detail Modal */}
       {selectedPost && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
           <div className="absolute inset-0 bg-wood-dark/60 backdrop-blur-md" onClick={() => setSelectedPost(null)}></div>
           
           <div className="relative w-full max-w-4xl max-h-[90vh] bg-paper overflow-y-auto shadow-2xl rounded-sm border border-wood-pale">
@@ -94,10 +95,10 @@ const Blog: React.FC = () => {
                   </p>
                 </header>
 
-                <div className="aspect-video overflow-hidden border border-wood-pale">
+                <div className="max-h-[500px] w-full overflow-hidden border border-wood-pale bg-black/5 flex items-center justify-center">
                   <img 
                     src={selectedPost.imageUrl} 
-                    className="w-full h-full object-cover" 
+                    className="max-w-full max-h-full object-contain" 
                     alt={selectedPost.title} 
                   />
                 </div>

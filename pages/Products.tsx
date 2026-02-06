@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { cmsStore } from '../services/cmsStore';
 import { Product } from '../types';
@@ -182,7 +181,7 @@ const Products: React.FC = () => {
       </div>
 
       {selectedProduct && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
           <div className="fixed inset-0 bg-wood-dark/80 backdrop-blur-md" onClick={() => setSelectedProduct(null)}></div>
           
           <div className="relative w-full max-w-6xl bg-paper flex flex-col md:flex-row shadow-2xl rounded-sm border border-wood-pale overflow-hidden max-h-[90vh]">
@@ -194,7 +193,7 @@ const Products: React.FC = () => {
             </button>
 
             {/* ÁREA VISUAL (IZQUIERDA) */}
-            <div className="w-full md:w-3/5 h-[300px] md:h-auto bg-black relative flex items-center justify-center group/viewer overflow-hidden">
+            <div className="w-full md:w-3/5 h-[300px] sm:h-[400px] md:h-auto bg-black relative flex items-center justify-center group/viewer overflow-hidden">
               {viewMode === 'gallery' ? (
                 <div className="w-full h-full flex items-center justify-center relative">
                    <img 
