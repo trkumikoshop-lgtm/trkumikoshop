@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Instagram, Mail, MessageCircle, Settings } from 'lucide-react';
@@ -64,7 +63,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     <div className="min-h-screen flex flex-col relative bg-paper transition-colors duration-1000">
       <KumikoPattern className="absolute inset-0 z-0" opacity={0.03} />
       
-      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-wood-pale shadow-sm">
+      <nav className="sticky top-0 z-[60] bg-white/95 backdrop-blur-md border-b border-wood-pale shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-20 items-center">
             <Link to="/" className="flex items-center gap-4 group">
@@ -121,7 +120,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         )}
       </nav>
 
-      <main className="flex-grow z-10 relative bg-tilo/50">
+      <main className="flex-grow bg-tilo/50">
         {children}
       </main>
 
