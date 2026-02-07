@@ -49,7 +49,8 @@ const DEFAULT_CONFIG: SiteConfig = {
       "CUADROS"
     ],
     "CORTE LÁSER": [
-      "MULTICAPA"
+      "MULTICAPA",
+      "LÁMPARAS"
     ],
     "GRABADO LÁSER": [
       "LLAVEROS"
@@ -61,6 +62,22 @@ const DEFAULT_CONFIG: SiteConfig = {
     ]
   },
   "products": [
+    {
+      "id": "1770457416705",
+      "name": "Lámpara Geometría de Luz",
+      "price": 30,
+      "description": "La Lámpara Geometría de Luz es una pieza decorativa que fusiona diseño moderno con artesanía en madera. Su estructura en forma de prisma rectangular está compuesta por piezas entrelazadas que forman un patrón hipnótico de cuadrados concéntricos, creando un juego de luces y sombras que transforma cualquier rincón en un espacio cálido y sofisticado.\nFabricada con precisión milimétrica, esta lámpara no solo ilumina: esculpe la luz, proyectando formas geométricas sobre las superficies cercanas. Ideal para ambientes minimalistas, nórdicos o con toques zen, su diseño simétrico aporta equilibrio visual y una presencia elegante que no pasa desapercibida.\nLa luz es RGB que cambia de color, pasando por un abánico de ambientes, lo que hace que sea aún más atractiva.",
+      "imageUrls": [
+        "https://image2url.com/r2/default/images/1770457871487-3668e731-7165-4d24-a03c-7ce9f9d3a66f.jpg",
+        "https://image2url.com/r2/default/images/1770457890196-feeae6dd-55b5-4df7-a741-edfe7dd5b076.jpg",
+        "https://image2url.com/r2/default/images/1770457910847-d86c3b8f-3bbb-4ab8-b7f2-4c531c1b88e0.jpg",
+        "https://image2url.com/r2/default/images/1770457931060-3d995e12-8641-49e7-9f47-12a42171b2d0.jpg"
+      ],
+      "category": "CORTE LÁSER",
+      "family": "LÁMPARAS",
+      "isCustomizable": true,
+      "videoUrl": ""
+    },
     {
       "id": "1770401023058",
       "name": "Cuadro patrón Asa-no-ha",
@@ -245,7 +262,7 @@ const DEFAULT_CONFIG: SiteConfig = {
       "id": "1769946145251",
       "name": "Rosa del Viento",
       "price": 90,
-      "description": "Mandala náutico en madera, con timón floral que fusiona dirección y belleza natural en una pieza armoniosa.\nEstá compuesto por ocho capas de madera de tilo. \nMedidas 37 cm x 37 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
+      "description": "Mandala náutico en madera, con timón floral que fusiona dirección y belleza natural en una pieza armoniosa.\nEstá compuesto por ocho capas de madera de tilo. \nLa imagen del salón está generada por IA las medidas correctas del mandala son 37 cm x 37 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
       "imageUrls": [
         "https://image2url.com/r2/default/images/1770312154277-af309169-c17f-43f0-916f-bf6e24922ef4.jpg",
         "https://image2url.com/r2/default/images/1770404786087-e640741f-a199-45bb-8846-6e9bb81cb84f.png"
@@ -258,9 +275,10 @@ const DEFAULT_CONFIG: SiteConfig = {
       "id": "1769945946467",
       "name": "Sol Interior",
       "price": 80,
-      "description": "Mandala solar cortado en madera, con formas radiantes y simetría envolvente que evocan energía, equilibrio y esplendor natural.\nEstá compuesto por ocho capas de madera de tilo. \nMedidas 37 cm x 37 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
+      "description": "Mandala solar cortado en madera, con formas radiantes y simetría envolvente que evocan energía, equilibrio y esplendor natural.\nEstá compuesto por ocho capas de madera de tilo. \nLa imagen del salón está generada por IA las medidas correctas del mandala son 37 cm x 37 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
       "imageUrls": [
-        "https://image2url.com/r2/default/images/1770312218823-6439ad26-21d7-4eed-ad81-a7cd9aa44a51.jpg"
+        "https://image2url.com/r2/default/images/1770312218823-6439ad26-21d7-4eed-ad81-a7cd9aa44a51.jpg",
+        "https://image2url.com/r2/default/images/1770450080642-67947989-e8a1-42f5-850d-4cd94301278e.png"
       ],
       "category": "CORTE LÁSER",
       "family": "MULTICAPA",
@@ -270,9 +288,10 @@ const DEFAULT_CONFIG: SiteConfig = {
       "id": "1769945778999",
       "name": "Raíz Noble",
       "price": 100,
-      "description": "Mandala familiar en madera, con tres elefantes que evocan protección, ternura y fuerza ancestral.\nEstá compuesto por nueve capas de madera de tilo. \nMedidas 38 cm x 28 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
+      "description": "Mandala familiar en madera, con dos elefantes que evocan protección, ternura y fuerza ancestral.\nEstá compuesto por nueve capas de madera de tilo. \nLa imagen del salón está generada por IA las medidas correctas del mandala son 38 cm x 38 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
       "imageUrls": [
-        "https://image2url.com/r2/default/images/1770312247555-1f3ef6bc-e750-4b41-b4a7-fedebe5a7ecd.jpg"
+        "https://image2url.com/r2/default/images/1770312247555-1f3ef6bc-e750-4b41-b4a7-fedebe5a7ecd.jpg",
+        "https://image2url.com/r2/default/images/1770450333364-4b063b6e-19f9-42c6-96d1-c2f5bf9c9378.png"
       ],
       "category": "CORTE LÁSER",
       "family": "MULTICAPA",
@@ -282,9 +301,10 @@ const DEFAULT_CONFIG: SiteConfig = {
       "id": "1769945196827",
       "name": "Eco de Luz",
       "price": 50,
-      "description": "Mandala geométrico en madera, de formas entrelazadas y simetría precisa que transmite equilibrio, profundidad y belleza estructural.\nEstá compuesto por cinco capas de madera de tilo. \nMedidas 33 cm x 36 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
+      "description": "Mandala geométrico en madera, de formas entrelazadas y simetría precisa que transmite equilibrio, profundidad y belleza estructural.\nEstá compuesto por cinco capas de madera de tilo. \nLa imagen del salón está generada por IA las medidas correctas del mandala son 33 cm x 36 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
       "imageUrls": [
-        "https://image2url.com/r2/default/images/1770312278700-61b0180e-2a14-4797-8212-b93bb2024fc4.avif"
+        "https://image2url.com/r2/default/images/1770451089432-236b22a6-6327-46c4-89ea-dbb55023b9bd.jpg",
+        "https://image2url.com/r2/default/images/1770451204861-3fdc056f-c642-4e99-88e5-3a5dca4c90ae.png"
       ],
       "category": "CORTE LÁSER",
       "family": "MULTICAPA",
@@ -294,9 +314,10 @@ const DEFAULT_CONFIG: SiteConfig = {
       "id": "1769944982747",
       "name": "Flor Infinita",
       "price": 100,
-      "description": "Mandala floral en madera, de simetría envolvente y capas delicadas que irradian equilibrio, belleza y profundidad artesanal.\nEstá compuesto por nueve capas de madera de tilo. \nMedidas 34 cm x 38 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
+      "description": "Mandala floral en madera, de simetría envolvente y capas delicadas que irradian equilibrio, belleza y profundidad artesanal.\nEstá compuesto por nueve capas de madera de tilo. \nLa imagen del salón está generada por IA las medidas correctas del mandala son 34 cm x 38 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
       "imageUrls": [
-        "https://image2url.com/r2/default/images/1770312303540-a3a5fe34-ea6e-4210-9396-25f6d8f82727.jpg"
+        "https://image2url.com/r2/default/images/1770312303540-a3a5fe34-ea6e-4210-9396-25f6d8f82727.jpg",
+        "https://image2url.com/r2/default/images/1770451603724-2f57a4c4-f4e2-4b04-9abe-c52ae3d1ca1d.png"
       ],
       "category": "CORTE LÁSER",
       "family": "MULTICAPA",
@@ -306,9 +327,10 @@ const DEFAULT_CONFIG: SiteConfig = {
       "id": "1769944834650",
       "name": "Flor de Silencio",
       "price": 60,
-      "description": "Mandala felino en madera, con silueta floral que fusiona naturaleza y serenidad en una composición armoniosa.\nEstá compuesto por seis capas de madera de tilo. \nMedidas 37 cm x 29 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
+      "description": "Mandala felino en madera, con silueta floral que fusiona naturaleza y serenidad en una composición armoniosa.\nEstá compuesto por seis capas de madera de tilo. \nLa imagen del salón está generada por IA las medidas correctas del mandala son 37 cm x 29 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
       "imageUrls": [
-        "https://image2url.com/r2/default/images/1770312328537-d6590985-487d-42cc-b074-fc59ab2326b5.jpg"
+        "https://image2url.com/r2/default/images/1770312328537-d6590985-487d-42cc-b074-fc59ab2326b5.jpg",
+        "https://image2url.com/r2/default/images/1770451886111-ae6fe7cc-5c9f-43b2-986f-2779bc8d5549.png"
       ],
       "category": "CORTE LÁSER",
       "family": "MULTICAPA",
@@ -318,9 +340,10 @@ const DEFAULT_CONFIG: SiteConfig = {
       "id": "1769944667921",
       "name": "Encuentro de Almas",
       "price": 80,
-      "description": "Mandala romántico en madera, con siluetas entrelazadas en un corazón floral que celebra el amor y la naturaleza.\nEstá compuesto por siete capas de madera de tilo. \nMedidas 37 cm x 33 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
+      "description": "Mandala romántico en madera, con siluetas entrelazadas en un corazón floral que celebra el amor y la naturaleza.\nEstá compuesto por siete capas de madera de tilo. \nLa imagen del salón está generada por IA las medidas correctas del mandala son 37 cm x 33 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
       "imageUrls": [
-        "https://image2url.com/r2/default/images/1770312359749-a43baf6e-87fc-46c5-8ef5-7863fd12cbb7.jpg"
+        "https://image2url.com/r2/default/images/1770312359749-a43baf6e-87fc-46c5-8ef5-7863fd12cbb7.jpg",
+        "https://image2url.com/r2/default/images/1770456257164-b1d73148-ff76-48e9-aa74-b519a5cc54c4.png"
       ],
       "category": "CORTE LÁSER",
       "family": "MULTICAPA",
@@ -330,9 +353,10 @@ const DEFAULT_CONFIG: SiteConfig = {
       "id": "1769944470797",
       "name": "Rostro Fiel",
       "price": 70,
-      "description": "Mandala canino cortado en madera, con rostro expresivo y texturas envolventes que irradian ternura, lealtad y calidez artesanal.\nEstá compuesto por siete capas de madera de tilo. \nMedidas 33 cm x 37 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
+      "description": "Mandala canino cortado en madera, con rostro expresivo y texturas envolventes que irradian ternura, lealtad y calidez artesanal.\nEstá compuesto por siete capas de madera de tilo. \nLa imagen del salón está generada por IA las medidas correctas del mandala son 33 cm x 37 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
       "imageUrls": [
-        "https://image2url.com/r2/default/images/1770312389449-dfa00173-9835-4dee-a498-6bc102a50cd6.jpg"
+        "https://image2url.com/r2/default/images/1770312389449-dfa00173-9835-4dee-a498-6bc102a50cd6.jpg",
+        "https://image2url.com/r2/default/images/1770456502517-755abd5f-f665-4d9a-b133-41dad750d963.png"
       ],
       "category": "CORTE LÁSER",
       "family": "MULTICAPA",
@@ -342,9 +366,10 @@ const DEFAULT_CONFIG: SiteConfig = {
       "id": "1769944264450",
       "name": "Jardín Alado",
       "price": 50,
-      "description": "Mandala en madera con mariposas y flores entrelazadas, que celebra la belleza efímera y la armonía natural con delicadeza artesanal.\nEstá compuesto por cuatro capas de madera de tilo. \nMedidas 38 cm x 38 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
+      "description": "Mandala en madera con mariposas y flores entrelazadas, que celebra la belleza efímera y la armonía natural con delicadeza artesanal.\nEstá compuesto por cuatro capas de madera de tilo. \nLa imagen del salón está generada por IA las medidas correctas del mandala son 38 cm x 38 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
       "imageUrls": [
-        "https://image2url.com/r2/default/images/1770312435202-6a2affcf-80ae-4e0e-aa02-c180731fb9e5.jpg"
+        "https://image2url.com/r2/default/images/1770312435202-6a2affcf-80ae-4e0e-aa02-c180731fb9e5.jpg",
+        "https://image2url.com/r2/default/images/1770456867699-9edeb976-5a66-43e5-9b6b-740de199b11d.png"
       ],
       "category": "CORTE LÁSER",
       "family": "MULTICAPA",
@@ -356,7 +381,8 @@ const DEFAULT_CONFIG: SiteConfig = {
       "price": 95,
       "description": "Mandala celestial cortado en madera, con sol y luna entrelazados en un diseño que irradia equilibrio, energía y serenidad cósmica.\nEstá compuesto por nueve capas de madera de tilo. \nLa imagen del salón está generada por IA las medidas correctas del mandala son 36 cm x 35 cm. \nSe puede colgar o colocar donde quieras.\nLos colores son totalmente personalizables.",
       "imageUrls": [
-        "https://image2url.com/r2/default/images/1770289339293-1eae9a24-ba4d-45fe-9343-490ad5a87a76.jpg"
+        "https://image2url.com/r2/default/images/1770289339293-1eae9a24-ba4d-45fe-9343-490ad5a87a76.jpg",
+        "https://image2url.com/r2/default/images/1770457293772-0480674b-5456-477a-ae30-79d0cf48ee77.png"
       ],
       "category": "CORTE LÁSER",
       "family": "MULTICAPA",
@@ -588,7 +614,7 @@ const DEFAULT_CONFIG: SiteConfig = {
       "title": "El nacimiento de una ilusión",
       "excerpt": "Este primer blog da nacimiento a una idea que nace de un hobby que siempre tuve, trabajar la madera.",
       "content": "\nEste primer blog no es solo un comienzo: es la apertura de una puerta que llevaba años llamando desde dentro. Una idea que nació de un hobby que siempre me acompañó en silencio, casi como un refugio íntimo: trabajar la madera.\n\nEn 2020 me adentré en la carpintería japonesa, especialmente en el kumiko. Allí descubrí algo más que una técnica. Encontré un territorio donde el tiempo se detiene, donde cada pieza exige presencia, paciencia y una entrega casi meditativa. Era mi forma de respirar en medio del ruido cotidiano.\n\nCon el paso del tiempo, mis amistades empezaron a pedirme piezas. Cada encargo lo creaba con un cariño profundo, con ese amor que solo nace cuando las manos hablan el mismo idioma que el corazón. Y al ver su reacción, entendí que quizá no era la única que encontraba belleza y calma en estas formas.\n\nEse pequeño gesto —alguien pidiendo una pieza hecha por mí— encendió una chispa. Me hizo replantearme cómo mostrar al mundo lo que ocurre en mi pequeño taller casero, ese rincón donde la madera se convierte en historia. Y así nació la idea de llevar este hobby a un nivel más alto, más consciente, más visible.\n\nPor este motivo empecé a publicar mis piezas en instagram y ahora crear esta página web. Espero con ello darle aún más visibilidad.\n\nLa adquisición a principios del 2025 de una grabadora láser me ha permitido el poder crear otro tipo de piezas en madera, las cuales podrás ver en mí colección de productos.\n\nEspero que esta andadura sea próspera y nos de grandes alegrías.\n\nUn saludo a todo el que entre en mí página web y empiece a formar parte de mí circulo de amigos.",
-      "date": "25 de Enero, 2026",
+      "date": "1 de febrero de 2026",
       "imageUrl": "https://image2url.com/r2/default/images/1770278412448-944fb423-8465-41d4-aa69-fe32b81153ab.jpg"
     }
   ]
