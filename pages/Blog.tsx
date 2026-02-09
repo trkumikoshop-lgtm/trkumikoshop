@@ -4,21 +4,27 @@ import { BlogPost } from '../types';
 import { X, Calendar, ArrowLeft } from 'lucide-react';
 
 const Blog: React.FC = () => {
-  // Added setConfig to the useState hook to allow updating the config from events
   const [config, setConfig] = useState(cmsStore.get());
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
 
   useEffect(() => {
-    // Fixed: setConfig is now defined from the useState hook above
     const handleUpdate = () => setConfig(cmsStore.get());
     const handlePreview = (e: any) => setConfig(e.detail);
     window.addEventListener('cms-update', handleUpdate);
     window.addEventListener('cms-preview', handlePreview);
+    
+    if (selectedPost) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
     return () => {
       window.removeEventListener('cms-update', handleUpdate);
       window.removeEventListener('cms-preview', handlePreview);
+      document.body.style.overflow = 'unset';
     };
-  }, []);
+  }, [selectedPost]);
 
   return (
     <div className="py-20 max-w-5xl mx-auto px-4 fade-in">
@@ -31,7 +37,7 @@ const Blog: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
         {config.blog.map(post => (
           <article key={post.id} className="group cursor-pointer" onClick={() => setSelectedPost(post)}>
-            <div className="relative overflow-hidden aspect-video mb-8 bg-tilo border border-wood-pale shadow-sm">
+            <div className="relative overflow-hidden aspect-video mb-8 bg-white border border-wood-pale shadow-sm flex items-center justify-center">
               <img 
                 src={post.imageUrl || 'https://images.unsplash.com/photo-1510797215324-95aa89f297a6?auto=format&fit=crop&q=80&w=800'} 
                 alt={post.title} 
@@ -60,11 +66,11 @@ const Blog: React.FC = () => {
 
       {/* Blog Post Detail Modal */}
       {selectedPost && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
-          <div className="absolute inset-0 bg-wood-dark/60 backdrop-blur-md" onClick={() => setSelectedPost(null)}></div>
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
+          <div className="absolute inset-0 bg-wood-dark/90 backdrop-blur-xl" onClick={() => setSelectedPost(null)}></div>
           
-          <div className="relative w-full max-w-4xl max-h-[90vh] bg-paper overflow-y-auto shadow-2xl rounded-sm border border-wood-pale">
-            <div className="sticky top-0 z-50 bg-white/90 backdrop-blur-sm border-b border-wood-pale p-4 flex justify-between items-center">
+          <div className="relative w-full max-w-4xl max-h-[95vh] bg-paper overflow-y-auto shadow-2xl rounded-sm border border-wood-pale">
+            <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-wood-pale p-4 flex justify-between items-center">
               <button 
                 onClick={() => setSelectedPost(null)}
                 className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-wood-dark hover:text-orange-800 transition-colors"
@@ -79,7 +85,7 @@ const Blog: React.FC = () => {
               </button>
             </div>
 
-            <div className="p-8 md:p-16">
+            <div className="p-6 md:p-16">
               <div className="max-w-2xl mx-auto space-y-12">
                 <header className="text-center space-y-6">
                   <div className="flex justify-center items-center gap-3">
@@ -95,10 +101,10 @@ const Blog: React.FC = () => {
                   </p>
                 </header>
 
-                <div className="max-h-[500px] w-full overflow-hidden border border-wood-pale bg-black/5 flex items-center justify-center">
+                <div className="min-h-[300px] md:min-h-[500px] w-full overflow-hidden border border-wood-pale bg-black flex items-center justify-center rounded-sm">
                   <img 
                     src={selectedPost.imageUrl} 
-                    className="max-w-full max-h-full object-contain" 
+                    className="max-w-full max-h-full object-contain p-2" 
                     alt={selectedPost.title} 
                   />
                 </div>
@@ -113,7 +119,7 @@ const Blog: React.FC = () => {
                   <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-8">Gracias por leer sobre nuestro proceso</p>
                   <button 
                     onClick={() => setSelectedPost(null)}
-                    className="bg-wood-dark text-white px-12 py-4 text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-black transition-all"
+                    className="bg-wood-dark text-white px-12 py-4 text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-black transition-all shadow-lg"
                   >
                     CERRAR ARTÍCULO
                   </button>

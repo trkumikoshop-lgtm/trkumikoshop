@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { cmsStore } from '../services/cmsStore';
 import { Product } from '../types';
 import { 
@@ -14,6 +14,16 @@ const Products: React.FC = () => {
   const [currentImgIdx, setCurrentImgIdx] = useState(0);
   const [viewMode, setViewMode] = useState<'gallery' | 'video'>('gallery');
 
+  // Bloquear scroll cuando el modal está abierto
+  useEffect(() => {
+    if (selectedProduct) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [selectedProduct]);
+
   const filteredProducts = config.products.filter(p => {
     const matchCat = catFilter === 'Todos' || p.category === catFilter;
     const matchFam = familyFilter === 'Todos' || p.family === familyFilter;
@@ -22,14 +32,13 @@ const Products: React.FC = () => {
 
   const categories = ['Todos', ...config.categories];
   
-  // Obtener familias disponibles para la categoría seleccionada
   const availableFamilies = catFilter !== 'Todos' 
     ? ['Todos', ...(config.categoryFamilies[catFilter] || [])] 
     : [];
 
   const handleCategoryChange = (cat: string) => {
     setCatFilter(cat);
-    setFamilyFilter('Todos'); // Resetear familia al cambiar categoría
+    setFamilyFilter('Todos');
   };
 
   const handleOpenProduct = (product: Product) => {
@@ -64,8 +73,6 @@ const Products: React.FC = () => {
 
   const renderVideoPlayer = (url: string) => {
     if (!url) return <div className="text-white">Video no disponible</div>;
-    
-    // Soporte para YouTube
     const youtubeRegex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const youtubeMatch = url.match(youtubeRegex);
     const youtubeId = (youtubeMatch && youtubeMatch[2].length === 11) ? youtubeMatch[2] : null;
@@ -82,7 +89,6 @@ const Products: React.FC = () => {
       );
     }
 
-    // Fallback para archivos directos
     return (
       <video src={url} controls autoPlay className="w-full h-full bg-black object-contain">
         Tu navegador no soporta el reproductor de video.
@@ -100,7 +106,6 @@ const Products: React.FC = () => {
         </div>
 
         <div className="flex flex-col items-center gap-6 mb-20">
-          {/* Filtro de Categorías */}
           <div className="flex flex-wrap justify-center gap-3">
             {categories.map(cat => (
               <button
@@ -115,7 +120,6 @@ const Products: React.FC = () => {
             ))}
           </div>
 
-          {/* Filtro de Familias (solo si hay una categoría seleccionada) */}
           {availableFamilies.length > 1 && (
             <div className="flex flex-wrap justify-center gap-2 pt-4 border-t border-wood-pale w-full max-w-2xl animate-in slide-in-from-top-2 duration-300">
               <span className="w-full text-center text-[9px] uppercase tracking-widest text-gray-400 mb-2 font-bold">Filtrar por familia</span>
@@ -141,11 +145,11 @@ const Products: React.FC = () => {
               className="group cursor-pointer"
               onClick={() => handleOpenProduct(product)}
             >
-              <div className="relative overflow-hidden aspect-[3/4] bg-white border border-wood-pale mb-6 shadow-sm">
+              <div className="relative overflow-hidden aspect-[3/4] bg-white border border-wood-pale mb-6 shadow-sm flex items-center justify-center bg-gray-50">
                 <img 
                   src={product.imageUrls[0] || 'https://via.placeholder.com/600x800?text=Sin+Imagen'} 
                   alt={product.name} 
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="w-full h-full object-contain p-4 transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="absolute top-4 right-4 bg-orange-800 text-white px-3 py-1 text-[8px] font-black uppercase tracking-[0.2em] border border-orange-900 z-20 shadow-lg">
                   {product.family}
@@ -166,59 +170,46 @@ const Products: React.FC = () => {
             </div>
           ))}
         </div>
-        
-        {filteredProducts.length === 0 && (
-          <div className="py-20 text-center">
-            <p className="text-gray-400 font-playfair italic text-xl">No se han encontrado piezas con estos filtros.</p>
-            <button 
-              onClick={() => handleCategoryChange('Todos')}
-              className="mt-6 text-[10px] uppercase tracking-widest font-black text-wood-dark border-b-2 border-wood-dark pb-1"
-            >
-              Ver todo el catálogo
-            </button>
-          </div>
-        )}
       </div>
 
       {selectedProduct && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
-          <div className="fixed inset-0 bg-wood-dark/80 backdrop-blur-md" onClick={() => setSelectedProduct(null)}></div>
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
+          <div className="fixed inset-0 bg-wood-dark/90 backdrop-blur-xl" onClick={() => setSelectedProduct(null)}></div>
           
-          <div className="relative w-full max-w-6xl bg-paper flex flex-col md:flex-row shadow-2xl rounded-sm border border-wood-pale overflow-hidden max-h-[90vh]">
+          <div className="relative w-full max-w-6xl bg-paper flex flex-col md:flex-row shadow-2xl rounded-sm border border-wood-pale overflow-hidden max-h-[95vh] overflow-y-auto">
             <button 
               onClick={() => setSelectedProduct(null)}
-              className="absolute top-6 right-6 z-[130] bg-white p-3 rounded-full hover:bg-orange-800 hover:text-white transition-all shadow-xl active:scale-90"
+              className="absolute top-4 right-4 z-[130] bg-white/90 p-3 rounded-full hover:bg-orange-800 hover:text-white transition-all shadow-xl active:scale-90"
             >
               <X size={24} />
             </button>
 
-            {/* ÁREA VISUAL (IZQUIERDA) */}
-            <div className="w-full md:w-3/5 h-[300px] sm:h-[400px] md:h-auto bg-black relative flex items-center justify-center group/viewer overflow-hidden">
+            {/* ÁREA VISUAL (IZQUIERDA) - Tamaño aumentado en móvil */}
+            <div className="w-full md:w-3/5 min-h-[450px] md:h-auto bg-black relative flex items-center justify-center group/viewer overflow-hidden">
               {viewMode === 'gallery' ? (
                 <div className="w-full h-full flex items-center justify-center relative">
                    <img 
                     key={selectedProduct.imageUrls[currentImgIdx]}
                     src={selectedProduct.imageUrls[currentImgIdx] || 'https://via.placeholder.com/800x800?text=Sin+Imagen'} 
-                    className="max-w-full max-h-full object-contain animate-in fade-in duration-700 select-none" 
+                    className="max-w-full max-h-full object-contain animate-in fade-in duration-700 select-none p-4" 
                     alt={selectedProduct.name}
                   />
                   
                   {selectedProduct.imageUrls.length > 1 && (
                     <>
-                      <button onClick={prevImg} className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white p-4 rounded-full backdrop-blur-md transition-all text-white hover:text-black">
-                        <ChevronLeft size={30} />
+                      <button onClick={prevImg} className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white p-3 rounded-full backdrop-blur-md transition-all text-white hover:text-black">
+                        <ChevronLeft size={24} />
                       </button>
-                      <button onClick={nextImg} className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white p-4 rounded-full backdrop-blur-md transition-all text-white hover:text-black">
-                        <ChevronRight size={30} />
+                      <button onClick={nextImg} className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white p-3 rounded-full backdrop-blur-md transition-all text-white hover:text-black">
+                        <ChevronRight size={24} />
                       </button>
 
-                      {/* NAVEGACIÓN MINIATURAS */}
-                      <div className="absolute bottom-6 flex gap-2 z-20 overflow-x-auto max-w-[90%] p-2">
+                      <div className="absolute bottom-4 flex gap-2 z-20 overflow-x-auto max-w-[90%] p-2 no-scrollbar">
                         {selectedProduct.imageUrls.map((url, idx) => (
                           <button 
                             key={idx}
                             onClick={(e) => { e.stopPropagation(); setCurrentImgIdx(idx); }}
-                            className={`w-12 h-12 border-2 transition-all flex-shrink-0 ${currentImgIdx === idx ? 'border-white scale-110 shadow-lg' : 'border-white/30 opacity-60'}`}
+                            className={`w-14 h-14 border-2 transition-all flex-shrink-0 rounded-sm ${currentImgIdx === idx ? 'border-white scale-110 shadow-lg' : 'border-white/20 opacity-60'}`}
                           >
                             <img src={url} className="w-full h-full object-cover" />
                           </button>
@@ -233,18 +224,17 @@ const Products: React.FC = () => {
                 </div>
               )}
 
-              {/* SELECTOR MODO VISTA */}
               {selectedProduct.videoUrl && (
-                <div className="absolute top-8 left-8 flex gap-2 z-[120]">
+                <div className="absolute top-4 left-4 flex gap-2 z-[120]">
                   <button 
                     onClick={() => setViewMode('gallery')} 
-                    className={`flex items-center gap-2 px-5 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${viewMode === 'gallery' ? 'bg-white text-black shadow-lg' : 'bg-black/40 text-white hover:bg-black/60'}`}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${viewMode === 'gallery' ? 'bg-white text-black shadow-lg' : 'bg-black/40 text-white hover:bg-black/60'}`}
                   >
                     <Camera size={14}/> FOTOS
                   </button>
                   <button 
                     onClick={() => setViewMode('video')} 
-                    className={`flex items-center gap-2 px-5 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${viewMode === 'video' ? 'bg-orange-600 text-white shadow-lg' : 'bg-black/40 text-white hover:bg-black/60'}`}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${viewMode === 'video' ? 'bg-orange-600 text-white shadow-lg' : 'bg-black/40 text-white hover:bg-black/60'}`}
                   >
                     <Play size={14}/> VÍDEO
                   </button>
@@ -253,17 +243,17 @@ const Products: React.FC = () => {
             </div>
 
             {/* ÁREA INFORMACIÓN (DERECHA) */}
-            <div className="w-full md:w-2/5 p-8 md:p-14 bg-paper flex flex-col justify-between border-l border-wood-pale overflow-y-auto">
+            <div className="w-full md:w-2/5 p-6 md:p-12 bg-paper flex flex-col justify-between border-l border-wood-pale">
               <div>
                 <div className="flex items-center gap-3 mb-6">
                   <span className="text-[10px] uppercase tracking-widest font-black text-white bg-wood-dark px-3 py-1">{selectedProduct.category}</span>
                   <span className="text-[10px] uppercase tracking-widest font-black text-orange-800 border border-orange-800 px-3 py-1">FAMILIA: {selectedProduct.family}</span>
                 </div>
                 
-                <h2 className="text-4xl md:text-5xl font-serif-jp font-bold text-wood-dark mb-4 tracking-tight">{selectedProduct.name}</h2>
-                <div className="text-3xl font-serif-jp text-wood-dark/70 mb-8 italic">{selectedProduct.price}€</div>
+                <h2 className="text-3xl md:text-5xl font-serif-jp font-bold text-wood-dark mb-4 tracking-tight">{selectedProduct.name}</h2>
+                <div className="text-2xl md:text-3xl font-serif-jp text-wood-dark/70 mb-8 italic">{selectedProduct.price}€</div>
                 
-                <p className="text-gray-600 font-playfair italic text-lg leading-relaxed whitespace-pre-wrap mb-8">
+                <p className="text-gray-600 font-playfair italic text-md md:text-lg leading-relaxed whitespace-pre-wrap mb-8">
                   {selectedProduct.description}
                 </p>
 
@@ -278,18 +268,18 @@ const Products: React.FC = () => {
                 )}
               </div>
 
-              <div className="space-y-4 pt-10 border-t border-wood-pale">
+              <div className="space-y-3 pt-6 border-t border-wood-pale">
                 <button 
                   onClick={() => handleWhatsApp(selectedProduct)}
-                  className="w-full bg-[#25D366] text-white py-5 px-8 flex items-center justify-center gap-4 text-[11px] font-black uppercase tracking-widest hover:bg-[#128C7E] transition-all border-b-8 border-[#075E54] shadow-lg"
+                  className="w-full bg-[#25D366] text-white py-4 md:py-5 px-8 flex items-center justify-center gap-4 text-[10px] md:text-[11px] font-black uppercase tracking-widest hover:bg-[#128C7E] transition-all border-b-4 border-[#075E54] shadow-lg"
                 >
-                  <MessageCircle size={20} /> CONSULTAR WHATSAPP
+                  <MessageCircle size={18} /> CONSULTAR WHATSAPP
                 </button>
                 <button 
                   onClick={() => handleEmail(selectedProduct)}
-                  className="w-full bg-wood-dark text-white py-5 px-8 flex items-center justify-center gap-4 text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all border-b-8 border-black shadow-lg"
+                  className="w-full bg-wood-dark text-white py-4 md:py-5 px-8 flex items-center justify-center gap-4 text-[10px] md:text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all border-b-4 border-black shadow-lg"
                 >
-                  <Mail size={20} /> CONSULTAR EMAIL
+                  <Mail size={18} /> CONSULTAR EMAIL
                 </button>
               </div>
             </div>
