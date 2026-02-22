@@ -64,6 +64,200 @@ const DEFAULT_CONFIG: SiteConfig = {
   },
   "products": [
     {
+      "id": "1771790710004",
+      "name": "Heartlight RGB - Corazones de Luz en 3D",
+      "price": 30,
+      "description": "HEARTLIGHT RGB es la lámpara perfecta para quienes quieren llenar su hogar de calidez, estilo y un toque emocional que nunca pasa desapercibido. Su diseño acrílico en 3D recrea un corazón luminoso con un efecto holográfico que parece flotar suavemente sobre la base, creando una atmósfera acogedora y encantadora. Es una pieza decorativa que transforma cualquier rincón en un espacio especial, lleno de personalidad y buenas vibraciones.\nLas bases con iluminación RGB multicolor despliegan un abanico de tonos que puedes adaptar a cada momento: colores suaves para relajarte, tonos vibrantes para animar la habitación o transiciones dinámicas que llenan el ambiente de vida. La luz recorre cada línea del diseño con una delicadeza hipnótica, haciendo que la lámpara destaque incluso apagada.\nEs ese tipo de objeto que imaginas en tu salón, en tu dormitorio o en tu rincón favorito, aportando un toque romántico y moderno a la vez. Una mezcla perfecta de diseño, emoción y tecnología que te hace pensar: “esta la quiero en mi casa”.",
+      "imageUrls": [
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Heartlight_RGB_pic1.jpg?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Heartlight_RGB_pic2.png?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Heartlight_RGB_pic3.png?raw=true"
+      ],
+      "category": "GRABADO LÁSER",
+      "family": "LÁMPARAS LED",
+      "isCustomizable": true
+    },
+    {
+      "id": "1771790480790",
+      "name": "Geo Elephant RGB - Elefantes de Luz en 3D",
+      "price": 30,
+      "description": "GEO ELEPHANT RGB es la lámpara perfecta para quienes buscan una pieza decorativa capaz de transformar cualquier espacio con estilo, originalidad y un toque de magia. Su diseño acrílico en 3D recrea un elefante geométrico con líneas limpias y futuristas que, al encenderse, parecen cobrar vida en un efecto holográfico hipnótico. Es una pieza que aporta personalidad y un aire moderno sin perder ese encanto cálido que invita a mirarla una y otra vez.\nLas bases con iluminación RGB multicolor despliegan un abanico vibrante de tonos que puedes adaptar al ambiente que quieras crear: colores suaves para relajarte, tonos brillantes para energizar la habitación o transiciones dinámicas que llenan el espacio de movimiento y luz. La forma en que la iluminación recorre el grabado hace que la figura destaque incluso apagada.\nEs ese tipo de lámpara que imaginas en tu salón, en tu dormitorio o en tu rincón favorito, aportando carácter y un brillo especial. Una mezcla perfecta de diseño, tecnología y encanto que te hace pensar: “esta la quiero en mi casa”.",
+      "imageUrls": [
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Geo_elephant_RGB_pic1.jpg?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Geo_elephant_RGB_pic2.png?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Geo_elephant_RGB_pic3.png?raw=true"
+      ],
+      "category": "GRABADO LÁSER",
+      "family": "LÁMPARAS LED",
+      "isCustomizable": true
+    },
+    {
+      "id": "1771790140429",
+      "name": "Zenlight Buddha RGB - Serenidad Lumínica en 3D",
+      "price": 30,
+      "description": "ZENLIGHT BUDDHA RGB es mucho más que una lámpara: es un pequeño templo de luz que transforma cualquier rincón en un espacio de calma, equilibrio y belleza. Su panel acrílico recrea la figura de un Buda sentado con un efecto 3D tan delicado y preciso que parece irradiar paz desde el interior. Es una pieza decorativa que aporta armonía y un toque espiritual sin perder la estética moderna.\nLas bases con iluminación RGB multicolor despliegan un abanico de tonos que puedes adaptar a tu estado de ánimo o al ambiente que quieras crear: colores suaves para meditar, tonos brillantes para energizar la habitación o transiciones dinámicas que llenan el espacio de vida. La luz se filtra por el grabado con una serenidad hipnótica, convirtiendo la lámpara en un punto focal que invita a respirar hondo y relajarse.\nEs ese tipo de objeto que imaginas en tu salón, en tu dormitorio o en tu rincón de meditación, aportando equilibrio y un brillo especial. Una mezcla perfecta de arte, espiritualidad y tecnología que te hace pensar: “esta la necesito en mi hogar”.",
+      "imageUrls": [
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Zenlight_Buddha_RGB_pic1.jpg?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Zenlight_Buddha_RGB_pic2.png?raw=true"
+      ],
+      "category": "GRABADO LÁSER",
+      "family": "LÁMPARAS LED",
+      "isCustomizable": true
+    },
+    {
+      "id": "1771789914468",
+      "name": "Elephant Glow RGB - Elefantitos de Luz en 3D",
+      "price": 30,
+      "description": "ELEPHANT GLOW RGB es la lámpara perfecta para quienes buscan un detalle decorativo dulce, moderno y capaz de llenar cualquier espacio de buen rollo. Su diseño acrílico en 3D recrea un elefantito adorable que parece cobrar vida cuando la luz se enciende, creando un efecto holográfico que roba miradas y sonrisas al instante. Es una pieza que aporta calidez, personalidad y un toque juguetón a cualquier rincón del hogar.\nLas bases con iluminación RGB multicolor despliegan un abanico vibrante de tonos que puedes adaptar a tu estado de ánimo: colores suaves para un ambiente relajante, tonos brillantes para animar la habitación o transiciones dinámicas que llenan el espacio de energía. La luz se filtra por el grabado con una delicadeza hipnótica, haciendo que la figura destaque incluso apagada.\nEs ese tipo de lámpara que imaginas en tu salón, en la habitación de los peques o en tu escritorio, aportando encanto y un brillo especial. Una mezcla perfecta de ternura, diseño y tecnología que te hace pensar: “esta la quiero en mi casa”.",
+      "imageUrls": [
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Elephant_glow_RGB_pic1.jpg?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Elephant_glow_RGB_pic2.png?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Elephant_glow_RGB_pic3.png?raw=true"
+      ],
+      "category": "GRABADO LÁSER",
+      "family": "LÁMPARAS LED",
+      "isCustomizable": true
+    },
+    {
+      "id": "1771789663580",
+      "name": "Sail Glow RGB - Navíos Lumínicos en 3D",
+      "price": 30,
+      "description": "SAIL GLOW RGB es la lámpara perfecta para quienes sienten fascinación por el mar, la aventura y los objetos decorativos que cuentan historias. Su panel acrílico recrea un majestuoso barco con un efecto 3D tan nítido que parece navegar sobre una ola de luz. Es una pieza que transforma cualquier estancia en un rincón lleno de carácter, calma y estilo.\nLas bases con iluminación RGB multicolor despliegan un abanico vibrante de tonos que puedes adaptar al ambiente que quieras crear: colores suaves para una atmósfera relajante, tonos intensos para un toque más moderno o transiciones dinámicas que llenan la habitación de vida. La luz se filtra por el grabado con una precisión hipnótica, haciendo que la lámpara destaque incluso apagada.\nEs ese tipo de objeto que imaginas en tu salón, en tu despacho o en tu dormitorio, aportando personalidad y un brillo especial. Una mezcla perfecta de diseño, nostalgia marinera y tecnología que te hace pensar: “esta la quiero en mi casa”.",
+      "imageUrls": [
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Sail_glow_RGB_pic1.jpg?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Sail_glow_RGB_pic2.png?raw=true"
+      ],
+      "category": "GRABADO LÁSER",
+      "family": "LÁMPARAS LED",
+      "isCustomizable": true
+    },
+    {
+      "id": "1771789453092",
+      "name": "Butterfly Dream RGB - Frascos de Luz Encantada",
+      "price": 30,
+      "description": "BUTTERFLY DREAM RGB es la lámpara perfecta para quienes buscan un detalle decorativo capaz de transformar cualquier rincón en un espacio cálido, poético y lleno de encanto. Su diseño acrílico recrea un frasco lleno de mariposas luminosas, como si hubieran quedado suspendidas en un instante mágico. El efecto 3D es tan suave y envolvente que parece que las mariposas flotan realmente dentro de la luz.\nLas bases con iluminación RGB multicolor despliegan un abanico vibrante de tonos que puedes adaptar a tu estado de ánimo: colores relajantes para crear un ambiente tranquilo, tonos brillantes para dar vida a la habitación o transiciones dinámicas que llenan el espacio de movimiento y fantasía. La luz se difunde con una delicadeza que convierte la lámpara en un punto focal irresistible, incluso cuando está apagada.\nEs ese tipo de pieza que imaginas en tu salón, en tu dormitorio o en tu rincón favorito de lectura, aportando serenidad y un toque de magia. Una mezcla perfecta de diseño, naturaleza y tecnología que te hace pensar: “esta la quiero en mi casa”.",
+      "imageUrls": [
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Butterfly_dream_RGB_pic1.jpg?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Butterfly_dream_RGB_pic2.png?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Butterfly_dream_RGB_pic3.png?raw=true"
+      ],
+      "category": "GRABADO LÁSER",
+      "family": "LÁMPARAS LED",
+      "isCustomizable": true
+    },
+    {
+      "id": "1771789188742",
+      "name": "Retrocall RGB - Teléfonos Lumínicos en 3D",
+      "price": 30,
+      "description": "RETROCALL RGB es la lámpara perfecta para quienes disfrutan de los objetos con historia, pero quieren darles un giro moderno y sorprendente. Su panel acrílico recrea un teléfono clásico con un efecto 3D tan nítido que parece flotar sobre la base, iluminándose con un brillo elegante y lleno de carácter. Es una pieza decorativa que convierte cualquier rincón en un punto de conversación instantáneo.\nLas bases con iluminación RGB multicolor despliegan un abanico vibrante de tonos que puedes adaptar al ambiente que quieras crear: luz suave para un toque vintage acogedor, colores intensos para un estilo más moderno o transiciones dinámicas que llenan la habitación de energía. La luz se filtra por el grabado con una precisión hipnótica, haciendo que la lámpara destaque incluso apagada.\nEs ese tipo de objeto que imaginas en tu salón, en tu estudio o junto a tu colección de piezas especiales, aportando personalidad y un toque único. Una mezcla perfecta de nostalgia, diseño y tecnología que te hace pensar: “esta la quiero en mi casa”.",
+      "imageUrls": [
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Retrocall_RGB_Pic1.jpg?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Retrocall_RGB_pic2.png?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Retrocall_RGB_pic3.png?raw=true"
+      ],
+      "category": "GRABADO LÁSER",
+      "family": "LÁMPARAS LED",
+      "isCustomizable": true
+    },
+    {
+      "id": "1771789077535",
+      "name": "Neo Mind RGB - Cabeza Holográfia en 3D",
+      "price": 30,
+      "description": "NEO MIND RGB es una lámpara diseñada para quienes aman el arte digital, la estética futurista y los objetos que cuentan una historia sin decir una palabra. Su panel acrílico recrea una cabeza geométrica con un efecto 3D sorprendente, como si una mente digital estuviera tomando forma justo delante de ti. Es una pieza que transforma cualquier espacio en un rincón creativo, moderno y lleno de personalidad.\nLa base con iluminación RGB multicolor despliega un abanico vibrante de tonos que puedes adaptar al ambiente que quieras crear: luz suave para relajarte, colores intensos para inspirarte o transiciones dinámicas que llenan la habitación de energía. La luz se filtra por el grabado con una precisión hipnótica, haciendo que la figura destaque incluso cuando no está encendida.\nEs ese tipo de lámpara que imaginas en tu escritorio, en tu salón o en tu estudio creativo, aportando un toque de diseño que no pasa desapercibido. Una mezcla perfecta de arte, tecnología y estilo que te hace pensar: “esta la necesito en mi espacio”.",
+      "imageUrls": [
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Neo_mind_RGB_pic1.jpg?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Neo_mind_RGB_pic2.png?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Neo_mind_RGB_pic3.png?raw=true"
+      ],
+      "category": "GRABADO LÁSER",
+      "family": "LÁMPARAS LED",
+      "isCustomizable": true
+    },
+    {
+      "id": "1771788368807",
+      "name": "Geometrical Bloom RGB - Arte Lumínico en 3D",
+      "price": 30,
+      "description": "GEOMETRIC BLOOM RGB es la lámpara que convierte cualquier espacio en un rincón moderno, cálido y lleno de estilo. Su diseño acrílico en 3D revela una flor geométrica que se ilumina con una precisión casi hipnótica, creando un efecto visual que mezcla arte, tecnología y serenidad. Es de esas piezas que elevan la decoración sin esfuerzo, aportando un toque sofisticado que no pasa desapercibido.\nLas bases con iluminación RGB multicolor despliegan un abanico vibrante de tonos que puedes adaptar a tu estado de ánimo o al ambiente que quieras crear: luz suave para relajarte, colores intensos para energizar la habitación o transiciones dinámicas que llenan el espacio de vida. La luz se filtra por el grabado con una delicadeza que hace que la lámpara destaque incluso apagada.\nEs el tipo de objeto que imaginas en tu mesa de centro, en tu dormitorio o en tu zona de lectura, aportando personalidad y un brillo especial. Una mezcla perfecta de diseño contemporáneo y magia lumínica que te hace pensar: “esta la quiero en mi casa”.",
+      "imageUrls": [
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Geometrical_bloom_RGB_pic1.jpg?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Geometrical_bloom_RGB_pic2.png?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Geometrical_bloom_RGB_pic3.png?raw=true"
+      ],
+      "category": "GRABADO LÁSER",
+      "family": "LÁMPARAS LED",
+      "isCustomizable": true
+    },
+    {
+      "id": "1771787996967",
+      "name": "Lotus Glow RBG - Flores de Luz en 3D",
+      "price": 30,
+      "description": "LOTUS GLOW RGB es mucho más que una lámpara: es un pequeño santuario de luz que transforma cualquier espacio en un rincón de calma y belleza. Su diseño acrílico en 3D recrea una flor de loto luminosa que parece abrirse suavemente sobre la base, creando un efecto visual hipnótico y lleno de armonía. Es la pieza perfecta para quienes buscan decoración moderna con un toque espiritual y artístico.\nLas bases con iluminación RGB multicolor despliegan un abanico vibrante de tonos que puedes adaptar a tu estado de ánimo: colores suaves para relajarte, tonos brillantes para energizar el ambiente o transiciones dinámicas que llenan la habitación de vida. La luz se difunde a través del grabado con una delicadeza que convierte la lámpara en un punto focal irresistible.\nEs ese tipo de objeto que imaginas encendido en tu salón, tu dormitorio o tu espacio de meditación, aportando serenidad y un toque de magia. Una mezcla perfecta de diseño, tecnología y emoción que hace que quieras tener una… o incluso regalar otra.",
+      "imageUrls": [
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Lotus_glow_RGB_pic1.jpg?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Lotus_glow_RGB_pic2.png?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Lotus_glow_RGB_pic3.png?raw=true"
+      ],
+      "category": "GRABADO LÁSER",
+      "family": "LÁMPARAS LED",
+      "isCustomizable": true
+    },
+    {
+      "id": "1771787413112",
+      "name": "Photo Glow RGB - Cámaras Lumínicas en 3D",
+      "price": 30,
+      "description": "PHOTO GLOW RGB es la lámpara perfecta para quienes aman la fotografía, el diseño moderno y los detalles que marcan la diferencia. Su panel acrílico crea una ilusión 3D espectacular con la silueta de una cámara que parece flotar sobre la base, iluminándose con un brillo limpio, preciso y lleno de estilo. Es una pieza decorativa que convierte cualquier mesa, estantería o rincón del salón en un punto focal lleno de personalidad.\nLas bases con iluminación RGB multicolor despliegan un abanico vibrante de tonos que puedes ajustar según tu ambiente: luz suave para relajarte, colores intensos para animar la habitación o transiciones dinámicas que llenan el espacio de energía creativa. La combinación del diseño técnico con el efecto holográfico hace que la lámpara destaque incluso apagada.\nEs ese tipo de objeto que ves y piensas: “esto quedaría increíble en mi estudio, en mi salón o junto a mi colección de cámaras”. Una mezcla perfecta de arte, tecnología y pasión por la imagen.",
+      "imageUrls": [
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Photo_glow_RGB_pic1.jpg?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Photo_glow_RGB_pic2.png?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Photo_glow_RGB_pic3.png?raw=true"
+      ],
+      "category": "GRABADO LÁSER",
+      "family": "LÁMPARAS LED",
+      "isCustomizable": true
+    },
+    {
+      "id": "1771786882256",
+      "name": "Ocean Wave RGB - Delfines Lumínicos en 3D",
+      "price": 30,
+      "description": "OCEAN WAVE RGB es la lámpara que convierte cualquier espacio en un rincón lleno de calma, magia y movimiento. Su diseño acrílico en 3D recrea la silueta de un delfín con un efecto holográfico que parece flotar sobre la base, como si estuviera surcando una ola luminosa. Es una pieza decorativa que transmite serenidad y, al mismo tiempo, un toque futurista que no pasa desapercibido.\nLas bases con iluminación RGB multicolor despliegan un abanico vibrante de tonos que puedes adaptar a tu estado de ánimo: desde colores suaves y relajantes hasta combinaciones más intensas y dinámicas. La luz se difunde a través del grabado creando un efecto visual hipnótico que transforma por completo la atmósfera de la habitación.\nEs el tipo de lámpara que te imaginas encendida en tu salón, tu dormitorio o tu zona de trabajo, aportando personalidad y un brillo especial. Una mezcla perfecta de arte, tecnología y emoción que te hace pensar: “quiero una en mi casa”.",
+      "imageUrls": [
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Ocean_wave_RGB_pic1.jpg?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Ocean_wave_RGB_pic2.png?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Ocean_wave_RGB_pic3.png?raw=true"
+      ],
+      "category": "GRABADO LÁSER",
+      "family": "LÁMPARAS LED",
+      "isCustomizable": true
+    },
+    {
+      "id": "1771786505985",
+      "name": "Dragon Glow RGB - Criaturas Lumínicas en 3D",
+      "price": 30,
+      "description": "DRAGON GLOW RGB es la lámpara que convierte cualquier rincón en un pequeño universo mágico. Su diseño acrílico en 3D revela una criatura fantástica llena de personalidad, iluminada con un brillo que parece cobrar vida. Es una pieza que no solo decora: captura miradas, despierta sonrisas y transforma el ambiente al instante.\nCada base incorpora iluminación RGB multicolor, capaz de desplegar un abanico vibrante de tonos que se mezclan suavemente o cambian de forma dinámica. El resultado es una luz envolvente que crea atmósferas cálidas, divertidas o futuristas según el momento. Perfecta para salones modernos, habitaciones juveniles o como regalo que sorprende de verdad.\nEs de esos objetos que no sabías que necesitabas… hasta que lo ves iluminado y te imaginas dónde quedaría perfecto en tu casa.",
+      "imageUrls": [
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Dragon_glow_RGB_pic1.jpg?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Dragon_glow_RGB_pic2.png?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Dragon_glow_RGB_pic3.png?raw=true"
+      ],
+      "category": "GRABADO LÁSER",
+      "family": "LÁMPARAS LED",
+      "isCustomizable": true
+    },
+    {
+      "id": "1771785936889",
+      "name": "Aura Hand RGB - Esculturas lumínicas holográficas",
+      "price": 30,
+      "description": "AURA HAND RGB no es solo una lámpara: es una pieza de arte tecnológico diseñada para transformar cualquier espacio en un rincón lleno de personalidad y estilo. Su holograma en forma de mano flotante crea un efecto visual hipnótico, limpio y futurista, perfecto para quienes buscan decoración moderna con un toque sorprendente.\nCada base incorpora iluminación RGB dinámica, capaz de desplegar un abanico vibrante de colores que se mezclan, cambian y envuelven el holograma con un brillo único. El resultado es una luz ambiental que no solo ilumina, sino que crea atmósfera, inspira creatividad y convierte cualquier estancia en un lugar especial.\nEs el tipo de objeto que hace que tus invitados pregunten “¿dónde lo has conseguido?”. Una pieza que combina diseño, tecnología y emoción en un solo gesto luminoso.",
+      "imageUrls": [
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Aura_hand_RGB_pic1.jpg?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Aura_hand_RGB_pic2.png?raw=true",
+        "https://github.com/trkumikoshop-lgtm/images2/blob/main/Aura_hand_RGB_pic3.png?raw=true"
+      ],
+      "category": "GRABADO LÁSER",
+      "family": "LÁMPARAS LED",
+      "isCustomizable": true
+    },
+    {
       "id": "1770457416705",
       "name": "Lámpara Geometría de Luz",
       "price": 30,
@@ -106,7 +300,7 @@ const DEFAULT_CONFIG: SiteConfig = {
       "category": "VARIOS",
       "family": "CASAS",
       "isCustomizable": true,
-      "videoUrl": "https://github.com/trkumikoshop-lgtm/images/blob/main/Casas_navidad_vid1.mp4"
+      "videoUrl": "https://github.com/trkumikoshop-lgtm/videos/blob/main/docs/Casas_navidad_vid1.mp4"
     },
     {
       "id": "1770314119463",
