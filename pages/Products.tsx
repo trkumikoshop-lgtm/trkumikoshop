@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { cmsStore } from '../services/cmsStore';
+import { useCms } from '../services/cmsContext';
 import { Product } from '../types';
 import { 
   X, MessageCircle, Mail, ChevronLeft, ChevronRight,
@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 
 const Products: React.FC = () => {
-  const [config] = useState(cmsStore.get());
+  const { config } = useCms();
   const [catFilter, setCatFilter] = useState<string>('Todos');
   const [familyFilter, setFamilyFilter] = useState<string>('Todos');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);

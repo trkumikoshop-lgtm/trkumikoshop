@@ -2,18 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Instagram, Mail, MessageCircle, Settings } from 'lucide-react';
 import KumikoPattern from './KumikoPattern';
-import { cmsStore } from '../services/cmsStore';
+import { useCms } from '../services/cmsContext';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [config, setConfig] = useState(cmsStore.get());
+  const { config } = useCms();
   const location = useLocation();
-
-  useEffect(() => {
-    const handleUpdate = () => setConfig(cmsStore.get());
-    window.addEventListener('cms-update', handleUpdate);
-    return () => window.removeEventListener('cms-update', handleUpdate);
-  }, []);
 
   // SEO: Generar JSON-LD para Google
   useEffect(() => {

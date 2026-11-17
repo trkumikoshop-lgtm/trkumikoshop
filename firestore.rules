@@ -1,0 +1,185 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helper Primitives ---
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isVerifiedUser() && (
+        request.auth.token.email == 'trkumikoshop@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // --- Validation Blueprints ---
+    function isValidSiteSettings(data) {
+      return data.keys().hasAll([
+          'siteName', 'logoUrl', 'home', 'about', 'contact',
+          'categories', 'categoryFamilies', 'updatedAt', 'updatedBy'
+        ])
+        && data.keys().hasOnly([
+          'siteName', 'logoUrl', 'home', 'about', 'contact',
+          'categories', 'categoryFamilies', 'updatedAt', 'updatedBy'
+        ])
+        && data.siteName is string && data.siteName.size() >= 1 && data.siteName.size() <= 200
+        && data.logoUrl is string && data.logoUrl.size() <= 450000
+        && data.home is map
+        && data.home.keys().hasAll(['title', 'subtitle', 'heroImage'])
+        && data.home.keys().hasOnly(['title', 'subtitle', 'heroImage'])
+        && data.home.title is string && data.home.title.size() <= 200
+        && data.home.subtitle is string && data.home.subtitle.size() <= 1000
+        && data.home.heroImage is string && data.home.heroImage.size() <= 450000
+        && data.about is map
+        && data.about.keys().hasAll(['title', 'content', 'image'])
+        && data.about.keys().hasOnly(['title', 'content', 'image'])
+        && data.about.title is string && data.about.title.size() <= 200
+        && data.about.content is string && data.about.content.size() <= 10000
+        && data.about.image is string && data.about.image.size() <= 450000
+        && data.contact is map
+        && data.contact.keys().hasAll(['title', 'description', 'email', 'phone', 'instagram'])
+        && data.contact.keys().hasOnly(['title', 'description', 'email', 'phone', 'instagram'])
+        && data.contact.title is string && data.contact.title.size() <= 200
+        && data.contact.description is string && data.contact.description.size() <= 2000
+        && data.contact.email is string && data.contact.email.size() <= 200
+        && data.contact.phone is string && data.contact.phone.size() <= 50
+        && data.contact.instagram is string && data.contact.instagram.size() <= 200
+        && data.categories is list && data.categories.size() <= 50
+        && (data.categories.size() == 0 || (data.categories[0] is string && data.categories[0].size() <= 100))
+        && data.categoryFamilies is map && data.categoryFamilies.size() <= 50
+        && data.updatedAt is timestamp && data.updatedAt == request.time
+        && data.updatedBy is string && data.updatedBy == request.auth.uid;
+    }
+
+    function isValidProduct(data, productId) {
+      return data.keys().hasAll([
+          'id', 'name', 'price', 'description', 'imageUrls',
+          'videoUrl', 'category', 'family', 'isCustomizable',
+          'sortOrder', 'updatedAt', 'updatedBy'
+        ])
+        && data.keys().hasOnly([
+          'id', 'name', 'price', 'description', 'imageUrls',
+          'videoUrl', 'category', 'family', 'isCustomizable',
+          'sortOrder', 'updatedAt', 'updatedBy'
+        ])
+        && isValidId(data.id)
+        && data.id == productId
+        && data.name is string && data.name.size() >= 1 && data.name.size() <= 200
+        && data.price is number && data.price >= 0 && data.price <= 1000000
+        && data.description is string && data.description.size() <= 5000
+        && data.imageUrls is list && data.imageUrls.size() <= 10
+        && (data.imageUrls.size() == 0 || (data.imageUrls[0] is string && data.imageUrls[0].size() <= 500000))
+        && data.videoUrl is string && data.videoUrl.size() <= 500
+        && data.category is string && data.category.size() >= 1 && data.category.size() <= 100
+        && data.family is string && data.family.size() >= 1 && data.family.size() <= 100
+        && data.isCustomizable is bool
+        && data.sortOrder is number && data.sortOrder >= 0 && data.sortOrder <= 1000000
+        && data.updatedAt is timestamp && data.updatedAt == request.time
+        && data.updatedBy is string && data.updatedBy == request.auth.uid;
+    }
+
+    function isValidBlogPost(data, postId) {
+      return data.keys().hasAll([
+          'id', 'title', 'excerpt', 'content', 'date',
+          'imageUrl', 'sortOrder', 'updatedAt', 'updatedBy'
+        ])
+        && data.keys().hasOnly([
+          'id', 'title', 'excerpt', 'content', 'date',
+          'imageUrl', 'sortOrder', 'updatedAt', 'updatedBy'
+        ])
+        && isValidId(data.id)
+        && data.id == postId
+        && data.title is string && data.title.size() >= 1 && data.title.size() <= 300
+        && data.excerpt is string && data.excerpt.size() <= 1000
+        && data.content is string && data.content.size() <= 20000
+        && data.date is string && data.date.size() <= 100
+        && data.imageUrl is string && data.imageUrl.size() <= 450000
+        && data.sortOrder is number && data.sortOrder >= 0 && data.sortOrder <= 1000000
+        && data.updatedAt is timestamp && data.updatedAt == request.time
+        && data.updatedBy is string && data.updatedBy == request.auth.uid;
+    }
+
+    // --- Collection Rules ---
+
+    // Storefront global settings (single 'main' doc, public get only)
+    match /site_settings/{settingId} {
+      allow get: if isValidId(settingId) && settingId == 'main';
+      allow list: if false;
+      allow create: if isVerifiedUser() && isValidId(settingId) && settingId == 'main'
+        && isValidSiteSettings(incoming()) && isAdmin();
+      allow update: if isVerifiedUser() && isValidId(settingId) && settingId == 'main'
+        && isValidSiteSettings(incoming())
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'siteName', 'logoUrl', 'home', 'about', 'contact',
+          'categories', 'categoryFamilies', 'updatedAt', 'updatedBy'
+        ])
+        && isAdmin();
+      allow delete: if false;
+    }
+
+    // Public Kumiko product catalog
+    match /products/{productId} {
+      allow get: if isValidId(productId);
+      allow list: if existing().name is string && existing().id is string;
+      allow create: if isVerifiedUser() && isValidId(productId)
+        && isValidProduct(incoming(), productId) && isAdmin();
+      allow update: if isVerifiedUser() && isValidId(productId)
+        && isValidProduct(incoming(), productId)
+        && incoming().id == existing().id
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'name', 'price', 'description', 'imageUrls',
+          'videoUrl', 'category', 'family', 'isCustomizable',
+          'sortOrder', 'updatedAt', 'updatedBy'
+        ])
+        && isAdmin();
+      allow delete: if isVerifiedUser() && isValidId(productId) && isAdmin();
+    }
+
+    // Public workshop blog entries
+    match /blog_posts/{postId} {
+      allow get: if isValidId(postId);
+      allow list: if existing().title is string && existing().id is string;
+      allow create: if isVerifiedUser() && isValidId(postId)
+        && isValidBlogPost(incoming(), postId) && isAdmin();
+      allow update: if isVerifiedUser() && isValidId(postId)
+        && isValidBlogPost(incoming(), postId)
+        && incoming().id == existing().id
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'title', 'excerpt', 'content', 'date',
+          'imageUrl', 'sortOrder', 'updatedAt', 'updatedBy'
+        ])
+        && isAdmin();
+      allow delete: if isVerifiedUser() && isValidId(postId) && isAdmin();
+    }
+
+    // Admin allowlist (read-only own record, server-managed)
+    match /admins/{adminId} {
+      allow get: if isSignedIn() && isValidId(adminId) && request.auth.uid == adminId;
+      allow list, create, update, delete: if false;
+    }
+  }
+}

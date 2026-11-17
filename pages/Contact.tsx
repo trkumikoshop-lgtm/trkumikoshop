@@ -1,22 +1,11 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Send, Phone, Mail, Instagram } from 'lucide-react';
-import { cmsStore } from '../services/cmsStore';
+import { useCms } from '../services/cmsContext';
 
 const Contact: React.FC = () => {
-  const [config, setConfig] = useState(cmsStore.get());
+  const { config } = useCms();
   const [sent, setSent] = useState(false);
-
-  useEffect(() => {
-    const handleUpdate = () => setConfig(cmsStore.get());
-    const handlePreview = (e: any) => setConfig(e.detail);
-    window.addEventListener('cms-update', handleUpdate);
-    window.addEventListener('cms-preview', handlePreview);
-    return () => {
-      window.removeEventListener('cms-update', handleUpdate);
-      window.removeEventListener('cms-preview', handlePreview);
-    };
-  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -36,8 +36,11 @@ Si entras en tu repositorio de GitHub, verás un botón desplegable a la izquier
 
 ---
 
-### Recordatorio: Contenido Permanente
-No olvides que para que tus cambios del panel `/admin` no se borren:
-1. Copia el JSON desde el panel de control de tu web.
-2. Pégalo en el archivo `services/cmsStore.ts`.
-3. Sube el archivo a GitHub (`git add .`, `git commit...`, `git push...`).
+### Sincronización Automática con Firebase (Panel `/admin`)
+La web está conectada a **Firebase (Firestore + Authentication)** para que cualquier producto, foto, texto o entrada de blog que publiques desde `/#/admin` aparezca automáticamente en la web de Netlify sin tener que editar código ni redesplegar.
+
+Para que el inicio de sesión con Google en `/#/admin` funcione desde tu dominio de Netlify:
+1. Entra en [Firebase Console](https://console.firebase.google.com/) y selecciona el proyecto `erudite-radius-4vc14`.
+2. Ve a **Authentication** -> **Settings** -> **Authorized domains**.
+3. Pulsa **Add domain** y añade tu dominio de Netlify (por ejemplo `tr-kumiko.netlify.app`).
+

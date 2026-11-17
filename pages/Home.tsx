@@ -1,18 +1,12 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 // Use named imports for react-router-dom to fix property access errors
 import { Link } from 'react-router-dom';
 import { ArrowRight, Info } from 'lucide-react';
-import { cmsStore } from '../services/cmsStore';
+import { useCms } from '../services/cmsContext';
 
 const Home: React.FC = () => {
-  const [config, setConfig] = useState(cmsStore.get());
-
-  useEffect(() => {
-    const handleUpdate = () => setConfig(cmsStore.get());
-    window.addEventListener('cms-update', handleUpdate);
-    return () => window.removeEventListener('cms-update', handleUpdate);
-  }, []);
+  const { config } = useCms();
 
   const buttonClass = "w-full md:w-auto bg-wood-dark text-white px-8 py-5 tracking-[0.2em] hover:bg-black transition-colors duration-300 flex items-center justify-center gap-3 shadow-lg text-[10px] font-bold uppercase border border-wood-dark";
 

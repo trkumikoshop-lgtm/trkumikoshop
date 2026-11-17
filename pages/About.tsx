@@ -1,15 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
-import { cmsStore } from '../services/cmsStore';
+import React from 'react';
+import { useCms } from '../services/cmsContext';
 
 const About: React.FC = () => {
-  const [config, setConfig] = useState(cmsStore.get());
-
-  useEffect(() => {
-    const handleUpdate = () => setConfig(cmsStore.get());
-    window.addEventListener('cms-update', handleUpdate);
-    return () => window.removeEventListener('cms-update', handleUpdate);
-  }, []);
+  const { config } = useCms();
 
   return (
     <div className="py-20 fade-in">

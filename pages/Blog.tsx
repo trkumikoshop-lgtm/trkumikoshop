@@ -1,18 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { cmsStore } from '../services/cmsStore';
+import { useCms } from '../services/cmsContext';
 import { BlogPost } from '../types';
 import { X, Calendar, ArrowLeft } from 'lucide-react';
 
 const Blog: React.FC = () => {
-  const [config, setConfig] = useState(cmsStore.get());
+  const { config } = useCms();
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
 
   useEffect(() => {
-    const handleUpdate = () => setConfig(cmsStore.get());
-    const handlePreview = (e: any) => setConfig(e.detail);
-    window.addEventListener('cms-update', handleUpdate);
-    window.addEventListener('cms-preview', handlePreview);
-    
     if (selectedPost) {
       document.body.style.overflow = 'hidden';
     } else {
@@ -20,8 +15,6 @@ const Blog: React.FC = () => {
     }
 
     return () => {
-      window.removeEventListener('cms-update', handleUpdate);
-      window.removeEventListener('cms-preview', handlePreview);
       document.body.style.overflow = 'unset';
     };
   }, [selectedPost]);

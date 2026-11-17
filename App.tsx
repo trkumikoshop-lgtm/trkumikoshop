@@ -8,6 +8,8 @@ import Blog from './pages/Blog';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Admin from './pages/Admin';
+import ErrorBoundary from './components/ErrorBoundary';
+import { CmsProvider } from './services/cmsContext';
 
 // Componente para llevar el scroll arriba al cambiar de página
 const ScrollToTop = () => {
@@ -20,19 +22,23 @@ const ScrollToTop = () => {
 
 const App: React.FC = () => {
   return (
-    <HashRouter>
-      <ScrollToTop />
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/productos" element={<Products />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/sobre-mi" element={<About />} />
-          <Route path="/contacto" element={<Contact />} />
-          <Route path="/admin" element={<Admin />} />
-        </Routes>
-      </Layout>
-    </HashRouter>
+    <ErrorBoundary>
+      <CmsProvider>
+        <HashRouter>
+          <ScrollToTop />
+          <Layout>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/productos" element={<Products />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/sobre-mi" element={<About />} />
+              <Route path="/contacto" element={<Contact />} />
+              <Route path="/admin" element={<Admin />} />
+            </Routes>
+          </Layout>
+        </HashRouter>
+      </CmsProvider>
+    </ErrorBoundary>
   );
 };
 
