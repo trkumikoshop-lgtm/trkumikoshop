@@ -1,9 +1,12 @@
 {
-  "apiKey": "AIzaSyAadk3b_1YRzSOFqSqBJS52Y5yxT4EQF8Y",
-  "authDomain": "tr-kumiko.firebaseapp.com",
-  "projectId": "tr-kumiko",
-  "storageBucket": "tr-kumiko.firebasestorage.app",
-  "messagingSenderId": "610002090730",
-  "appId": "1:610002090730:web:14919ab07e750dba873593",
-  "firestoreDatabaseId": "(default)"
+  "projectId": "erudite-radius-4vc14",
+  "appId": "1:509084849046:web:fb975644e41dd6f0c103b7",
+  "apiKey": "AIzaSyDd_97tx7uzabqF6mazzRB86JjPVjg8SPY",
+  "authDomain": "erudite-radius-4vc14.firebaseapp.com",
+  "firestoreDatabaseId": "ai-studio-version8mejoraim-85255da6-942d-4ce2-bf76-8327442a2a2b",
+  "storageBucket": "erudite-radius-4vc14.firebasestorage.app",
+  "messagingSenderId": "509084849046",
+  "measurementId": "",
+  "oAuthClientId": "509084849046-ghnfl5nrh1abi65svne1qsb807eq5rdo.apps.googleusercontent.com",
+  "recaptchaSiteKey": ""
 }

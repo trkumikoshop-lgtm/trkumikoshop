@@ -8,34 +8,11 @@ import {
 
 const Products: React.FC = () => {
   const { config } = useCms();
-  const [catFilter, setCatFilter] = useState<string>(() => config.categories[0] || '');
-  const [familyFilter, setFamilyFilter] = useState<string>(() => {
-    const firstCat = config.categories[0] || '';
-    return config.categoryFamilies[firstCat]?.[0] || '';
-  });
+  const [catFilter, setCatFilter] = useState<string>('Todos');
+  const [familyFilter, setFamilyFilter] = useState<string>('Todos');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [currentImgIdx, setCurrentImgIdx] = useState(0);
   const [viewMode, setViewMode] = useState<'gallery' | 'video'>('gallery');
-
-  const categories = config.categories;
-  const availableFamilies = catFilter ? (config.categoryFamilies[catFilter] || []) : [];
-
-  // Sincronizar filtro si cambian las categorías/familias desde la nube
-  useEffect(() => {
-    if (categories.length > 0 && (!catFilter || !categories.includes(catFilter))) {
-      const nextCat = categories[0];
-      setCatFilter(nextCat);
-      setFamilyFilter(config.categoryFamilies[nextCat]?.[0] || '');
-    }
-  }, [categories, catFilter, config.categoryFamilies]);
-
-  useEffect(() => {
-    if (availableFamilies.length > 0 && (!familyFilter || !availableFamilies.includes(familyFilter))) {
-      setFamilyFilter(availableFamilies[0]);
-    } else if (availableFamilies.length === 0 && familyFilter !== '') {
-      setFamilyFilter('');
-    }
-  }, [availableFamilies, familyFilter]);
 
   // Bloquear scroll cuando el modal está abierto
   useEffect(() => {
@@ -48,14 +25,20 @@ const Products: React.FC = () => {
   }, [selectedProduct]);
 
   const filteredProducts = config.products.filter(p => {
-    const matchCat = !catFilter || p.category === catFilter;
-    const matchFam = availableFamilies.length === 0 || !familyFilter || p.family === familyFilter;
+    const matchCat = catFilter === 'Todos' || p.category === catFilter;
+    const matchFam = familyFilter === 'Todos' || p.family === familyFilter;
     return matchCat && matchFam;
   });
 
+  const categories = ['Todos', ...config.categories];
+  
+  const availableFamilies = catFilter !== 'Todos' 
+    ? ['Todos', ...(config.categoryFamilies[catFilter] || [])] 
+    : [];
+
   const handleCategoryChange = (cat: string) => {
     setCatFilter(cat);
-    setFamilyFilter(config.categoryFamilies[cat]?.[0] || '');
+    setFamilyFilter('Todos');
   };
 
   const handleOpenProduct = (product: Product) => {
@@ -137,7 +120,7 @@ const Products: React.FC = () => {
             ))}
           </div>
 
-          {availableFamilies.length > 0 && (
+          {availableFamilies.length > 1 && (
             <div className="flex flex-wrap justify-center gap-2 pt-4 border-t border-wood-pale w-full max-w-2xl animate-in slide-in-from-top-2 duration-300">
               <span className="w-full text-center text-[9px] uppercase tracking-widest text-gray-400 mb-2 font-bold">Filtrar por familia</span>
               {availableFamilies.map(fam => (

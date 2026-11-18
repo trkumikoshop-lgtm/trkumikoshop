@@ -23,7 +23,7 @@ import {
 import { cmsStore, DEFAULT_CONFIG } from './cmsStore';
 import { BlogPost, Product, SiteConfig } from '../types';
 
-const ADMIN_EMAILS = ['trkumikoshop@gmail.com', 'trkumikoweb@gmail.com'];
+const BOOTSTRAPPED_ADMIN_EMAIL = 'trkumikoshop@gmail.com';
 
 interface CmsContextValue {
   config: SiteConfig;
@@ -158,7 +158,7 @@ export const CmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return;
       }
 
-      if (ADMIN_EMAILS.includes((currentUser.email || '').toLowerCase())) {
+      if (currentUser.email?.toLowerCase() === BOOTSTRAPPED_ADMIN_EMAIL) {
         setIsAdmin(true);
         setAuthReady(true);
         return;

@@ -84,13 +84,7 @@ const Admin: React.FC = () => {
       await signInWithGoogle();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'No se pudo iniciar sesión con Google.';
-      if (msg.includes('auth/unauthorized-domain')) {
-        setAuthError(
-          `El dominio actual (${window.location.hostname}) no está autorizado en Firebase. Añade exactamente "${window.location.hostname}" en Firebase Console → Authentication → Configuración → Dominios autorizados.`
-        );
-      } else {
-        setAuthError(msg);
-      }
+      setAuthError(msg);
     } finally {
       setIsSigningIn(false);
     }
@@ -319,7 +313,7 @@ const Admin: React.FC = () => {
             Cuenta sin permisos de taller
           </h2>
           <p className="text-xs text-gray-600 leading-relaxed">
-            Has iniciado sesión como <strong className="text-[#4A3728]">{user.email}</strong>, pero solo las cuentas autorizadas del taller (<strong className="text-[#4A3728]">trkumikoweb@gmail.com</strong> o <strong className="text-[#4A3728]">trkumikoshop@gmail.com</strong>) pueden publicar cambios.
+            Has iniciado sesión como <strong className="text-[#4A3728]">{user.email}</strong>, pero solo la cuenta autorizada del taller puede publicar cambios.
           </p>
           <div className="flex flex-col gap-3">
             <button
