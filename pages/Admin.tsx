@@ -84,7 +84,13 @@ const Admin: React.FC = () => {
       await signInWithGoogle();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'No se pudo iniciar sesión con Google.';
-      setAuthError(msg);
+      if (msg.includes('auth/unauthorized-domain')) {
+        setAuthError(
+          `El dominio actual (${window.location.hostname}) no está autorizado en Firebase. Añade exactamente "${window.location.hostname}" en Firebase Console → Authentication → Configuración → Dominios autorizados.`
+        );
+      } else {
+        setAuthError(msg);
+      }
     } finally {
       setIsSigningIn(false);
     }
@@ -123,30 +129,32 @@ const Admin: React.FC = () => {
               width = maxWidth;
             }
 
-            canvas.width = Math.round(width);
-            canvas.height = Math.round(height);
+            canvas.width = Math.max(1, Math.round(width));
+            canvas.height = Math.max(1, Math.round(height));
             const ctx = canvas.getContext('2d');
             if (!ctx) throw new Error('Error de contexto');
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-            let out = canvas.toDataURL('image/webp', quality);
-            if (!out.startsWith('data:image/webp') || out.length > 380000) {
-              out = canvas.toDataURL('image/jpeg', quality);
-            }
-            return out;
+            // JPEG es compatible al 100% con cualquier móvil, tablet (iOS/Android) y ordenador
+            return canvas.toDataURL('image/jpeg', quality);
           };
 
           try {
             const attempts: [number, number][] = [
-              [960, 0.72],
-              [800, 0.62],
-              [640, 0.55],
-              [480, 0.45],
+              [960, 0.78],
+              [800, 0.68],
+              [640, 0.58],
+              [480, 0.48],
+              [360, 0.4],
             ];
-            let result = tryEncode(960, 0.72);
+            let result = tryEncode(960, 0.78);
             for (const [w, q] of attempts) {
               result = tryEncode(w, q);
-              if (result.length <= 380000) break;
+              if (result.length <= 350000) break;
             }
             resolve(result);
           } catch (err) {
@@ -219,9 +227,22 @@ const Admin: React.FC = () => {
   };
 
   const handleUrlUpload = (targetId: string, type: string) => {
-    const url = urlInputs[targetId || type];
-    if (!url || !url.trim()) return;
-    applyImageUpdate(url.trim(), targetId, type);
+    const raw = urlInputs[targetId || type];
+    const url = raw?.trim();
+    if (!url) return;
+    if (url.startsWith('blob:') || url.startsWith('file:')) {
+      setErrorBanner(
+        'Esa ruta es temporal o local de tu ordenador y no se verá en móviles/tablets. Usa el botón "Subir Archivo" o una URL pública https://.'
+      );
+      return;
+    }
+    if (url.startsWith('http://')) {
+      setErrorBanner(
+        'Las URLs con http:// suelen bloquearse en móviles/tablets por seguridad. Usa https:// o el botón "Subir Archivo".'
+      );
+      return;
+    }
+    applyImageUpdate(url, targetId, type);
     setUrlInputs((prev) => ({ ...prev, [targetId || type]: '' }));
   };
 
@@ -313,7 +334,7 @@ const Admin: React.FC = () => {
             Cuenta sin permisos de taller
           </h2>
           <p className="text-xs text-gray-600 leading-relaxed">
-            Has iniciado sesión como <strong className="text-[#4A3728]">{user.email}</strong>, pero solo la cuenta autorizada del taller puede publicar cambios.
+            Has iniciado sesión como <strong className="text-[#4A3728]">{user.email}</strong>, pero solo las cuentas autorizadas del taller (<strong className="text-[#4A3728]">trkumikoweb@gmail.com</strong> o <strong className="text-[#4A3728]">trkumikoshop@gmail.com</strong>) pueden publicar cambios.
           </p>
           <div className="flex flex-col gap-3">
             <button

@@ -94,10 +94,10 @@ const Blog: React.FC = () => {
                   </p>
                 </header>
 
-                <div className="min-h-[300px] md:min-h-[500px] w-full overflow-hidden border border-wood-pale bg-black flex items-center justify-center rounded-sm">
+                <div className="h-[280px] sm:h-[380px] md:h-[460px] w-full overflow-hidden border border-wood-pale bg-black flex items-center justify-center rounded-sm">
                   <img 
                     src={selectedPost.imageUrl} 
-                    className="max-w-full max-h-full object-contain p-2" 
+                    className="max-w-full max-h-full w-auto h-auto object-contain p-2" 
                     alt={selectedPost.title} 
                   />
                 </div>

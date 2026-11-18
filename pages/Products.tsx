@@ -8,11 +8,34 @@ import {
 
 const Products: React.FC = () => {
   const { config } = useCms();
-  const [catFilter, setCatFilter] = useState<string>('Todos');
-  const [familyFilter, setFamilyFilter] = useState<string>('Todos');
+  const [catFilter, setCatFilter] = useState<string>(() => config.categories[0] || '');
+  const [familyFilter, setFamilyFilter] = useState<string>(() => {
+    const firstCat = config.categories[0] || '';
+    return config.categoryFamilies[firstCat]?.[0] || '';
+  });
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [currentImgIdx, setCurrentImgIdx] = useState(0);
   const [viewMode, setViewMode] = useState<'gallery' | 'video'>('gallery');
+
+  const categories = config.categories;
+  const availableFamilies = catFilter ? (config.categoryFamilies[catFilter] || []) : [];
+
+  // Sincronizar filtro si cambian las categorías/familias desde la nube
+  useEffect(() => {
+    if (categories.length > 0 && (!catFilter || !categories.includes(catFilter))) {
+      const nextCat = categories[0];
+      setCatFilter(nextCat);
+      setFamilyFilter(config.categoryFamilies[nextCat]?.[0] || '');
+    }
+  }, [categories, catFilter, config.categoryFamilies]);
+
+  useEffect(() => {
+    if (availableFamilies.length > 0 && (!familyFilter || !availableFamilies.includes(familyFilter))) {
+      setFamilyFilter(availableFamilies[0]);
+    } else if (availableFamilies.length === 0 && familyFilter !== '') {
+      setFamilyFilter('');
+    }
+  }, [availableFamilies, familyFilter]);
 
   // Bloquear scroll cuando el modal está abierto
   useEffect(() => {
@@ -25,20 +48,17 @@ const Products: React.FC = () => {
   }, [selectedProduct]);
 
   const filteredProducts = config.products.filter(p => {
-    const matchCat = catFilter === 'Todos' || p.category === catFilter;
-    const matchFam = familyFilter === 'Todos' || p.family === familyFilter;
+    const matchCat = !catFilter || p.category.trim().toUpperCase() === catFilter.trim().toUpperCase();
+    const matchFam =
+      availableFamilies.length === 0 ||
+      !familyFilter ||
+      p.family.trim().toUpperCase() === familyFilter.trim().toUpperCase();
     return matchCat && matchFam;
   });
 
-  const categories = ['Todos', ...config.categories];
-  
-  const availableFamilies = catFilter !== 'Todos' 
-    ? ['Todos', ...(config.categoryFamilies[catFilter] || [])] 
-    : [];
-
   const handleCategoryChange = (cat: string) => {
     setCatFilter(cat);
-    setFamilyFilter('Todos');
+    setFamilyFilter(config.categoryFamilies[cat]?.[0] || '');
   };
 
   const handleOpenProduct = (product: Product) => {
@@ -120,7 +140,7 @@ const Products: React.FC = () => {
             ))}
           </div>
 
-          {availableFamilies.length > 1 && (
+          {availableFamilies.length > 0 && (
             <div className="flex flex-wrap justify-center gap-2 pt-4 border-t border-wood-pale w-full max-w-2xl animate-in slide-in-from-top-2 duration-300">
               <span className="w-full text-center text-[9px] uppercase tracking-widest text-gray-400 mb-2 font-bold">Filtrar por familia</span>
               {availableFamilies.map(fam => (
@@ -138,42 +158,55 @@ const Products: React.FC = () => {
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20">
-          {filteredProducts.map(product => (
-            <div 
-              key={product.id} 
-              className="group cursor-pointer"
-              onClick={() => handleOpenProduct(product)}
-            >
-              <div className="relative overflow-hidden aspect-[3/4] bg-white border border-wood-pale mb-6 shadow-sm flex items-center justify-center bg-gray-50">
-                <img 
-                  src={product.imageUrls[0] || 'https://via.placeholder.com/600x800?text=Sin+Imagen'} 
-                  alt={product.name} 
-                  className="w-full h-full object-contain p-4 transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute top-4 right-4 bg-orange-800 text-white px-3 py-1 text-[8px] font-black uppercase tracking-[0.2em] border border-orange-900 z-20 shadow-lg">
-                  {product.family}
-                </div>
-                {product.videoUrl && (
-                  <div className="absolute bottom-4 left-4 bg-white/80 backdrop-blur-sm p-2 rounded-full">
-                    <Play size={16} className="text-wood-dark fill-wood-dark" />
+        {filteredProducts.length === 0 ? (
+          <div className="text-center py-16 text-wood-dark/50 font-playfair italic text-lg">
+            No hay piezas disponibles en esta categoría todavía.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20">
+            {filteredProducts.map(product => (
+              <div 
+                key={product.id} 
+                className="group cursor-pointer"
+                onClick={() => handleOpenProduct(product)}
+              >
+                <div className="relative overflow-hidden aspect-[3/4] w-full bg-gray-50 border border-wood-pale mb-6 shadow-sm">
+                  <img 
+                    src={product.imageUrls[0] || "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='800' viewBox='0 0 600 800'%3E%3Crect width='600' height='800' fill='%23FDFBF7'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%234A3728' font-family='sans-serif' font-size='22'%3ESin imagen%3C/text%3E%3C/svg%3E"} 
+                    alt={product.name} 
+                    onError={(e) => {
+                      const img = e.currentTarget;
+                      if (!img.dataset.fallback) {
+                        img.dataset.fallback = '1';
+                        img.src = "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='800' viewBox='0 0 600 800'%3E%3Crect width='600' height='800' fill='%23FDFBF7'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%234A3728' font-family='sans-serif' font-size='22'%3EImagen no disponible%3C/text%3E%3C/svg%3E";
+                      }
+                    }}
+                    className="absolute inset-0 w-full h-full object-contain p-4 transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute top-4 right-4 bg-orange-800 text-white px-3 py-1 text-[8px] font-black uppercase tracking-[0.2em] border border-orange-900 z-20 shadow-lg">
+                    {product.family}
                   </div>
-                )}
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex justify-between items-baseline">
-                  <h3 className="text-2xl font-serif-jp text-wood-dark tracking-tight">{product.name}</h3>
-                  <span className="font-serif-jp text-xl text-wood-dark/60">{product.price}€</span>
+                  {product.videoUrl && (
+                    <div className="absolute bottom-4 left-4 bg-white/80 backdrop-blur-sm p-2 rounded-full">
+                      <Play size={16} className="text-wood-dark fill-wood-dark" />
+                    </div>
+                  )}
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex justify-between items-baseline">
+                    <h3 className="text-2xl font-serif-jp text-wood-dark tracking-tight">{product.name}</h3>
+                    <span className="font-serif-jp text-xl text-wood-dark/60">{product.price}€</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {selectedProduct && (
-        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 md:p-8 fade-in">
           <div className="fixed inset-0 bg-wood-dark/90 backdrop-blur-xl" onClick={() => setSelectedProduct(null)}></div>
           
           <div className="relative w-full max-w-6xl bg-paper flex flex-col md:flex-row shadow-2xl rounded-sm border border-wood-pale overflow-hidden max-h-[95vh] overflow-y-auto">
@@ -184,14 +217,21 @@ const Products: React.FC = () => {
               <X size={24} />
             </button>
 
-            {/* ÁREA VISUAL (IZQUIERDA) - Tamaño aumentado en móvil */}
-            <div className="w-full md:w-3/5 min-h-[450px] md:h-auto bg-black relative flex items-center justify-center group/viewer overflow-hidden">
+            {/* ÁREA VISUAL (IZQUIERDA) - Altura explícita en móvil/tablet para evitar colapso en Safari */}
+            <div className="w-full md:w-3/5 h-[360px] sm:h-[460px] md:h-[580px] shrink-0 bg-black relative flex items-center justify-center group/viewer overflow-hidden">
               {viewMode === 'gallery' ? (
                 <div className="w-full h-full flex items-center justify-center relative">
                    <img 
-                    key={selectedProduct.imageUrls[currentImgIdx]}
-                    src={selectedProduct.imageUrls[currentImgIdx] || 'https://via.placeholder.com/800x800?text=Sin+Imagen'} 
-                    className="max-w-full max-h-full object-contain animate-in fade-in duration-700 select-none p-4" 
+                    key={selectedProduct.imageUrls[currentImgIdx] || 'empty'}
+                    src={selectedProduct.imageUrls[currentImgIdx] || "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800' viewBox='0 0 800 800'%3E%3Crect width='800' height='800' fill='%23111111'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23EBDCC5' font-family='sans-serif' font-size='26'%3ESin imagen%3C/text%3E%3C/svg%3E"} 
+                    onError={(e) => {
+                      const img = e.currentTarget;
+                      if (!img.dataset.fallback) {
+                        img.dataset.fallback = '1';
+                        img.src = "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800' viewBox='0 0 800 800'%3E%3Crect width='800' height='800' fill='%23111111'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23EBDCC5' font-family='sans-serif' font-size='26'%3EImagen no disponible%3C/text%3E%3C/svg%3E";
+                      }
+                    }}
+                    className="max-w-full max-h-full w-auto h-auto object-contain select-none p-4" 
                     alt={selectedProduct.name}
                   />
                   

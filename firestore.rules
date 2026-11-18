@@ -32,6 +32,7 @@ service cloud.firestore {
     function isAdmin() {
       return isVerifiedUser() && (
         request.auth.token.email == 'trkumikoshop@gmail.com' ||
+        request.auth.token.email == 'trkumikoweb@gmail.com' ||
         exists(/databases/$(database)/documents/admins/$(request.auth.uid))
       );
     }
@@ -144,7 +145,7 @@ service cloud.firestore {
     // Public Kumiko product catalog
     match /products/{productId} {
       allow get: if isValidId(productId);
-      allow list: if existing().name is string && existing().id is string;
+      allow list: if true;
       allow create: if isVerifiedUser() && isValidId(productId)
         && isValidProduct(incoming(), productId) && isAdmin();
       allow update: if isVerifiedUser() && isValidId(productId)
@@ -162,7 +163,7 @@ service cloud.firestore {
     // Public workshop blog entries
     match /blog_posts/{postId} {
       allow get: if isValidId(postId);
-      allow list: if existing().title is string && existing().id is string;
+      allow list: if true;
       allow create: if isVerifiedUser() && isValidId(postId)
         && isValidBlogPost(incoming(), postId) && isAdmin();
       allow update: if isVerifiedUser() && isValidId(postId)

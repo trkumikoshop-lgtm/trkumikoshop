@@ -23,7 +23,7 @@ import {
 import { cmsStore, DEFAULT_CONFIG } from './cmsStore';
 import { BlogPost, Product, SiteConfig } from '../types';
 
-const BOOTSTRAPPED_ADMIN_EMAIL = 'trkumikoshop@gmail.com';
+const ADMIN_EMAILS = ['trkumikoshop@gmail.com', 'trkumikoweb@gmail.com'];
 
 interface CmsContextValue {
   config: SiteConfig;
@@ -114,21 +114,15 @@ export const CmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       categoryFamilies: DEFAULT_CONFIG.categoryFamilies,
     };
 
-    const sortedProducts: Product[] = hasSettings
-      ? [...(remoteProductsRef.current || [])]
-          .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
-          .map(({ sortOrder: _s, ...rest }) => rest)
-      : hasProducts
+    const sortedProducts: Product[] =
+      productsLoadedRef.current && (hasSettings || hasProducts)
         ? [...(remoteProductsRef.current || [])]
             .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
             .map(({ sortOrder: _s, ...rest }) => rest)
         : DEFAULT_CONFIG.products;
 
-    const sortedBlog: BlogPost[] = hasSettings
-      ? [...(remoteBlogRef.current || [])]
-          .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
-          .map(({ sortOrder: _s, ...rest }) => rest)
-      : hasBlog
+    const sortedBlog: BlogPost[] =
+      blogLoadedRef.current && (hasSettings || hasBlog)
         ? [...(remoteBlogRef.current || [])]
             .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
             .map(({ sortOrder: _s, ...rest }) => rest)
@@ -158,7 +152,7 @@ export const CmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return;
       }
 
-      if (currentUser.email?.toLowerCase() === BOOTSTRAPPED_ADMIN_EMAIL) {
+      if (ADMIN_EMAILS.includes((currentUser.email || '').toLowerCase())) {
         setIsAdmin(true);
         setAuthReady(true);
         return;
@@ -307,18 +301,29 @@ export const CmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             : ['General'];
         });
 
+      const logoStr = typeof nextConfig.logoUrl === 'string' ? nextConfig.logoUrl : '';
+      const heroStr = typeof nextConfig.home?.heroImage === 'string' ? nextConfig.home.heroImage : '';
+      const aboutStr = typeof nextConfig.about?.image === 'string' ? nextConfig.about.image : '';
+      if (logoStr.length > 450000 || heroStr.length > 450000 || aboutStr.length > 450000) {
+        return {
+          success: false,
+          error:
+            'Una de las imágenes de Logo, Portada o Sobre Mí supera 450 KB. Sube una versión más ligera desde "Subir Archivo".',
+        };
+      }
+
       const settingsPayload = {
         siteName: clampStr(nextConfig.siteName || 'TR-KUMIKO', 200) || 'TR-KUMIKO',
-        logoUrl: clampStr(nextConfig.logoUrl || '', 450000),
+        logoUrl: logoStr,
         home: {
           title: clampStr(nextConfig.home?.title || '', 200),
           subtitle: clampStr(nextConfig.home?.subtitle || '', 1000),
-          heroImage: clampStr(nextConfig.home?.heroImage || '', 450000),
+          heroImage: heroStr,
         },
         about: {
           title: clampStr(nextConfig.about?.title || '', 200),
           content: clampStr(nextConfig.about?.content || '', 10000),
-          image: clampStr(nextConfig.about?.image || '', 450000),
+          image: aboutStr,
         },
         contact: {
           title: clampStr(nextConfig.contact?.title || '', 200),
@@ -346,9 +351,14 @@ export const CmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const preparedProducts = (nextConfig.products || []).map((p, index) => {
         const cleanId = sanitizeId(p.id, 'prod', index);
         seenProductIds.add(cleanId);
-        const safeImages = (p.imageUrls || [])
-          .filter((url) => typeof url === 'string' && url.length <= 500000)
-          .slice(0, 10);
+        const rawImages = (p.imageUrls || []).filter((url) => typeof url === 'string' && url.length > 0);
+        const oversizedImg = rawImages.find((url) => url.length > 500000);
+        if (oversizedImg) {
+          throw new Error(
+            `Una fotografía del producto "${p.name}" supera el límite de 500 KB. Vuelve a subirla con el botón "Subir Archivo" para comprimirla.`
+          );
+        }
+        const safeImages = rawImages.slice(0, 10);
 
         const payload = {
           id: cleanId,
@@ -378,13 +388,19 @@ export const CmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const preparedBlog = (nextConfig.blog || []).map((b, index) => {
         const cleanId = sanitizeId(b.id, 'post', index);
         seenBlogIds.add(cleanId);
+        const blogImg = typeof b.imageUrl === 'string' ? b.imageUrl : '';
+        if (blogImg.length > 450000) {
+          throw new Error(
+            `La imagen del artículo "${b.title}" supera 450 KB. Vuelve a subirla con el botón "Subir Archivo".`
+          );
+        }
         const payload = {
           id: cleanId,
           title: clampStr(b.title || 'Artículo sin título', 300) || 'Artículo sin título',
           excerpt: clampStr(b.excerpt || '', 1000),
           content: clampStr(b.content || '', 20000),
           date: clampStr(b.date || '', 100),
-          imageUrl: clampStr(b.imageUrl || '', 450000),
+          imageUrl: blogImg,
           sortOrder: index,
           updatedAt: serverTimestamp(),
           updatedBy: uid,
@@ -421,6 +437,7 @@ export const CmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }
 
         await batch.commit();
+        setConfig(nextConfig);
 
         // Update local cache optimistically
         try {
