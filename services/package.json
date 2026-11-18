@@ -1,0 +1,29 @@
+{
+  "name": "tr-kumiko-web",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && cp sitemap.xml robots.txt dist/",
+    "preview": "vite preview",
+    "lint": "tsc --noEmit && eslint firestore.rules"
+  },
+  "dependencies": {
+    "@firebase/eslint-plugin-security-rules": "^0.0.2",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^10.15.0",
+    "firebase": "^13.4.0",
+    "lucide-react": "^0.462.0",
+    "postcss": "^8.4.49",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.1.0",
+    "tailwindcss": "^3.4.15",
+    "typescript": "~5.6.2",
+    "vite": "^6.0.1"
+  }
+}

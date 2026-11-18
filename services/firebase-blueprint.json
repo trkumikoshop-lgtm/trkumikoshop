@@ -1,0 +1,245 @@
+{
+  "entities": {
+    "SiteSettings": {
+      "title": "SiteSettings",
+      "description": "Global storefront configuration including branding, home hero, about page, contact details, and catalog taxonomy.",
+      "type": "object",
+      "properties": {
+        "siteName": {
+          "type": "string",
+          "description": "Commercial name of the workshop",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "logoUrl": {
+          "type": "string",
+          "description": "URL or compressed data URI for the workshop logo",
+          "maxLength": 450000
+        },
+        "home": {
+          "type": "object",
+          "description": "Home page hero title, subtitle, and image"
+        },
+        "about": {
+          "type": "object",
+          "description": "About page title, story content, and portrait image"
+        },
+        "contact": {
+          "type": "object",
+          "description": "Public workshop contact details"
+        },
+        "categories": {
+          "type": "array",
+          "description": "List of main product categories"
+        },
+        "categoryFamilies": {
+          "type": "object",
+          "description": "Map from category name to array of family names"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update"
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "UID of the admin who last updated settings",
+          "maxLength": 128
+        }
+      },
+      "required": [
+        "siteName",
+        "logoUrl",
+        "home",
+        "about",
+        "contact",
+        "categories",
+        "categoryFamilies",
+        "updatedAt",
+        "updatedBy"
+      ]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Handcrafted Kumiko wood piece listed in the catalog.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique product identifier",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Product display name",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "price": {
+          "type": "number",
+          "description": "Price in euros"
+        },
+        "description": {
+          "type": "string",
+          "description": "Product details and materials",
+          "maxLength": 5000
+        },
+        "imageUrls": {
+          "type": "array",
+          "description": "Product image URLs or compressed data URIs (max 10)"
+        },
+        "videoUrl": {
+          "type": "string",
+          "description": "Optional YouTube or MP4 video URL",
+          "maxLength": 500
+        },
+        "category": {
+          "type": "string",
+          "description": "Primary catalog category",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "family": {
+          "type": "string",
+          "description": "Subcategory family",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "isCustomizable": {
+          "type": "boolean",
+          "description": "Whether custom dimensions or patterns are supported"
+        },
+        "sortOrder": {
+          "type": "number",
+          "description": "Display ordering index"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update"
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "UID of the admin who last updated the product",
+          "maxLength": 128
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "price",
+        "description",
+        "imageUrls",
+        "videoUrl",
+        "category",
+        "family",
+        "isCustomizable",
+        "sortOrder",
+        "updatedAt",
+        "updatedBy"
+      ]
+    },
+    "BlogPost": {
+      "title": "BlogPost",
+      "description": "Workshop journal entry published on the blog.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique blog post identifier",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "title": {
+          "type": "string",
+          "description": "Blog post headline",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "excerpt": {
+          "type": "string",
+          "description": "Short summary shown in blog listing",
+          "maxLength": 1000
+        },
+        "content": {
+          "type": "string",
+          "description": "Full article body text",
+          "maxLength": 20000
+        },
+        "date": {
+          "type": "string",
+          "description": "Display date string",
+          "maxLength": 100
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "Cover image URL or compressed data URI",
+          "maxLength": 450000
+        },
+        "sortOrder": {
+          "type": "number",
+          "description": "Display ordering index"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update"
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "UID of the admin who last updated the post",
+          "maxLength": 128
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "excerpt",
+        "content",
+        "date",
+        "imageUrl",
+        "sortOrder",
+        "updatedAt",
+        "updatedBy"
+      ]
+    },
+    "AdminUser": {
+      "title": "AdminUser",
+      "description": "Trusted admin allowlist entry keyed by Firebase Auth UID.",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 200
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin"]
+        }
+      },
+      "required": ["email", "role"]
+    }
+  },
+  "firestore": {
+    "/site_settings/{settingId}": {
+      "schema": { "$ref": "#/entities/SiteSettings" },
+      "description": "Global storefront configuration document (settingId = 'main')"
+    },
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Catalog of Kumiko products displayed publicly and managed by admin"
+    },
+    "/blog_posts/{postId}": {
+      "schema": { "$ref": "#/entities/BlogPost" },
+      "description": "Workshop blog entries displayed publicly and managed by admin"
+    },
+    "/admins/{adminId}": {
+      "schema": { "$ref": "#/entities/AdminUser" },
+      "description": "Server-managed admin allowlist"
+    }
+  }
+}
