@@ -84,7 +84,13 @@ const Admin: React.FC = () => {
       await signInWithGoogle();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'No se pudo iniciar sesión con Google.';
-      setAuthError(msg);
+      if (msg.includes('auth/unauthorized-domain')) {
+        setAuthError(
+          `El dominio actual (${window.location.hostname}) no está autorizado en Firebase. Añade exactamente "${window.location.hostname}" en Firebase Console → Authentication → Configuración → Dominios autorizados.`
+        );
+      } else {
+        setAuthError(msg);
+      }
     } finally {
       setIsSigningIn(false);
     }
