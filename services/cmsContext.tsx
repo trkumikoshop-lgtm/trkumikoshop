@@ -117,8 +117,10 @@ export const CmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const sortedProducts: Product[] =
       productsLoadedRef.current && (hasSettings || hasProducts)
         ? [...(remoteProductsRef.current || [])]
-            .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
             .map(({ sortOrder: _s, ...rest }) => rest)
+            .sort((a, b) =>
+              a.name.trim().localeCompare(b.name.trim(), 'es', { sensitivity: 'base', numeric: true })
+            )
         : DEFAULT_CONFIG.products;
 
     const sortedBlog: BlogPost[] =
@@ -348,7 +350,13 @@ export const CmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
 
       const seenProductIds = new Set<string>();
-      const preparedProducts = (nextConfig.products || []).map((p, index) => {
+      const sortedInputProducts = [...(nextConfig.products || [])].sort((a, b) =>
+        (a.name || '').trim().localeCompare((b.name || '').trim(), 'es', {
+          sensitivity: 'base',
+          numeric: true,
+        })
+      );
+      const preparedProducts = sortedInputProducts.map((p, index) => {
         const cleanId = sanitizeId(p.id, 'prod', index);
         seenProductIds.add(cleanId);
         const rawImages = (p.imageUrls || []).filter((url) => typeof url === 'string' && url.length > 0);
@@ -437,11 +445,15 @@ export const CmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }
 
         await batch.commit();
-        setConfig(nextConfig);
+        const orderedNextConfig: SiteConfig = {
+          ...nextConfig,
+          products: sortedInputProducts,
+        };
+        setConfig(orderedNextConfig);
 
         // Update local cache optimistically
         try {
-          localStorage.setItem('tr_kumiko_config', JSON.stringify(nextConfig));
+          localStorage.setItem('tr_kumiko_config', JSON.stringify(orderedNextConfig));
         } catch {
           // Ignore localStorage cap
         }

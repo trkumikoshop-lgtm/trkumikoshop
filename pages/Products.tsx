@@ -47,14 +47,18 @@ const Products: React.FC = () => {
     return () => { document.body.style.overflow = 'unset'; };
   }, [selectedProduct]);
 
-  const filteredProducts = config.products.filter(p => {
-    const matchCat = !catFilter || p.category.trim().toUpperCase() === catFilter.trim().toUpperCase();
-    const matchFam =
-      availableFamilies.length === 0 ||
-      !familyFilter ||
-      p.family.trim().toUpperCase() === familyFilter.trim().toUpperCase();
-    return matchCat && matchFam;
-  });
+  const filteredProducts = config.products
+    .filter(p => {
+      const matchCat = !catFilter || p.category.trim().toUpperCase() === catFilter.trim().toUpperCase();
+      const matchFam =
+        availableFamilies.length === 0 ||
+        !familyFilter ||
+        p.family.trim().toUpperCase() === familyFilter.trim().toUpperCase();
+      return matchCat && matchFam;
+    })
+    .sort((a, b) =>
+      a.name.trim().localeCompare(b.name.trim(), 'es', { sensitivity: 'base', numeric: true })
+    );
 
   const handleCategoryChange = (cat: string) => {
     setCatFilter(cat);
