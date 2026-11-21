@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useCms } from '../services/cmsContext';
 import { SiteConfig } from '../types';
@@ -26,7 +26,25 @@ import {
   Link as LinkIcon,
   Upload,
   LogOut,
+  HardDrive,
+  Minimize2,
 } from 'lucide-react';
+
+const MAX_DOC_BYTES = 950_000;
+const MAX_DB_BYTES = 1024 * 1024 * 1024; // 1 GiB plan Spark gratuito
+const MAX_MONTHLY_EGRESS_BYTES = 10 * 1024 * 1024 * 1024; // 10 GiB/mes plan Spark gratuito
+
+const textEncoder = new TextEncoder();
+const measureJsonBytes = (value: unknown): number =>
+  textEncoder.encode(JSON.stringify(value)).length;
+
+const formatBytes = (bytes: number): string => {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+};
+
+type CompressionProfile = 'product' | 'hero' | 'logo' | 'blog';
 
 const Admin: React.FC = () => {
   const {
@@ -53,11 +71,82 @@ const Admin: React.FC = () => {
   const [confirmRestore, setConfirmRestore] = useState(false);
   const [errorBanner, setErrorBanner] = useState<string | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [lastCompressionNote, setLastCompressionNote] = useState<string | null>(null);
+  const [isOptimizingAll, setIsOptimizingAll] = useState(false);
   const [urlInputs, setUrlInputs] = useState<Record<string, string>>({});
   const [newCatName, setNewCatName] = useState('');
   const [newFamilyInputs, setNewFamilyInputs] = useState<Record<string, string>>({});
 
   const latestConfigRef = useRef<SiteConfig>(config);
+
+  const memoryStats = useMemo(() => {
+    const settingsPayload = {
+      siteName: config.siteName || '',
+      logoUrl: config.logoUrl || '',
+      home: config.home,
+      about: config.about,
+      contact: config.contact,
+      categories: config.categories,
+      categoryFamilies: config.categoryFamilies,
+    };
+    const settingsBytes = measureJsonBytes(settingsPayload) + 200;
+
+    const productBytesMap: Record<string, number> = {};
+    let totalProductsBytes = 0;
+    for (const p of config.products) {
+      const b = measureJsonBytes(p) + 200;
+      productBytesMap[p.id] = b;
+      totalProductsBytes += b;
+    }
+
+    const blogBytesMap: Record<string, number> = {};
+    let totalBlogBytes = 0;
+    for (const post of config.blog) {
+      const b = measureJsonBytes(post) + 200;
+      blogBytesMap[post.id] = b;
+      totalBlogBytes += b;
+    }
+
+    const totalDbBytes = settingsBytes + totalProductsBytes + totalBlogBytes;
+    const dbPct = Math.min(100, (totalDbBytes / MAX_DB_BYTES) * 100);
+    const settingsPct = Math.min(100, (settingsBytes / MAX_DOC_BYTES) * 100);
+
+    const itemCount = config.products.length + config.blog.length;
+    const avgItemBytes =
+      itemCount > 0 ? Math.max(40_000, (totalProductsBytes + totalBlogBytes) / itemCount) : 115_000;
+    const remainingEstimatedItems = Math.max(
+      0,
+      Math.floor((MAX_DB_BYTES - totalDbBytes) / avgItemBytes)
+    );
+    const estimatedMonthlyVisits =
+      totalDbBytes > 0 ? Math.floor(MAX_MONTHLY_EGRESS_BYTES / totalDbBytes) : 99999;
+
+    let heavyImagesCount = 0;
+    if (config.logoUrl?.startsWith('data:image/') && config.logoUrl.length > 85_000) heavyImagesCount++;
+    if (config.home?.heroImage?.startsWith('data:image/') && config.home.heroImage.length > 175_000) heavyImagesCount++;
+    if (config.about?.image?.startsWith('data:image/') && config.about.image.length > 135_000) heavyImagesCount++;
+    for (const p of config.products) {
+      for (const u of p.imageUrls) {
+        if (u.startsWith('data:image/') && u.length > 135_000) heavyImagesCount++;
+      }
+    }
+    for (const post of config.blog) {
+      if (post.imageUrl?.startsWith('data:image/') && post.imageUrl.length > 135_000) heavyImagesCount++;
+    }
+
+    return {
+      settingsBytes,
+      settingsPct,
+      productBytesMap,
+      blogBytesMap,
+      totalDbBytes,
+      dbPct,
+      remainingEstimatedItems,
+      estimatedMonthlyVisits,
+      heavyImagesCount,
+      totalDocsCount: 1 + config.products.length + config.blog.length,
+    };
+  }, [config]);
 
   useEffect(() => {
     if (!hasChanges) {
@@ -110,58 +199,136 @@ const Admin: React.FC = () => {
     });
   }, []);
 
-  const compressImage = (file: File): Promise<string> => {
+  const compressImageSource = (
+    src: string,
+    profile: CompressionProfile = 'product'
+  ): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = src;
+
+      img.onload = () => {
+        const tryEncode = (maxSide: number, quality: number): string => {
+          const longestSide = Math.max(img.width, img.height);
+          const scale = longestSide > maxSide ? maxSide / longestSide : 1;
+          const targetW = Math.max(1, Math.round(img.width * scale));
+          const targetH = Math.max(1, Math.round(img.height * scale));
+
+          // Reducción progresiva en dos pasos cuando la imagen original es >2x más grande
+          // para conservar nitidez en vetas de madera y entramados Kumiko sin dientes de sierra
+          let sourceCanvas: HTMLImageElement | HTMLCanvasElement = img;
+          if (longestSide > maxSide * 2) {
+            const midW = Math.max(targetW * 2, Math.round(img.width * 0.5));
+            const midH = Math.max(targetH * 2, Math.round(img.height * 0.5));
+            const midCanvas = document.createElement('canvas');
+            midCanvas.width = midW;
+            midCanvas.height = midH;
+            const midCtx = midCanvas.getContext('2d');
+            if (midCtx) {
+              midCtx.fillStyle = '#FFFFFF';
+              midCtx.fillRect(0, 0, midW, midH);
+              midCtx.imageSmoothingEnabled = true;
+              midCtx.imageSmoothingQuality = 'high';
+              midCtx.drawImage(img, 0, 0, midW, midH);
+              sourceCanvas = midCanvas;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = targetW;
+          canvas.height = targetH;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) throw new Error('Error de contexto');
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, targetW, targetH);
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(sourceCanvas, 0, 0, targetW, targetH);
+
+          // JPEG es universal en iOS, Android y escritorio
+          return canvas.toDataURL('image/jpeg', quality);
+        };
+
+        try {
+          const profileConfig: Record<
+            CompressionProfile,
+            { targetLen: number; attempts: [number, number][] }
+          > = {
+            logo: {
+              targetLen: 75_000,
+              attempts: [
+                [480, 0.82],
+                [480, 0.74],
+                [400, 0.7],
+                [320, 0.65],
+              ],
+            },
+            hero: {
+              targetLen: 160_000,
+              attempts: [
+                [1280, 0.8],
+                [1150, 0.75],
+                [1024, 0.72],
+                [900, 0.68],
+                [800, 0.62],
+              ],
+            },
+            product: {
+              targetLen: 115_000,
+              attempts: [
+                [960, 0.78],
+                [900, 0.74],
+                [840, 0.7],
+                [760, 0.68],
+                [680, 0.64],
+                [600, 0.58],
+              ],
+            },
+            blog: {
+              targetLen: 115_000,
+              attempts: [
+                [960, 0.78],
+                [900, 0.74],
+                [840, 0.7],
+                [760, 0.68],
+                [680, 0.64],
+                [600, 0.58],
+              ],
+            },
+          };
+
+          const { targetLen, attempts } = profileConfig[profile];
+          let result = tryEncode(attempts[0][0], attempts[0][1]);
+          for (const [side, q] of attempts) {
+            result = tryEncode(side, q);
+            if (result.length <= targetLen) break;
+          }
+
+          if (src.startsWith('data:image/jpeg') && result.length >= src.length) {
+            resolve(src);
+            return;
+          }
+          resolve(result);
+        } catch (err) {
+          reject(err);
+        }
+      };
+
+      img.onerror = () => reject(new Error('Error de carga'));
+    });
+  };
+
+  const compressImage = (file: File, profile: CompressionProfile): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target?.result as string;
-
-        img.onload = () => {
-          const tryEncode = (maxWidth: number, quality: number): string => {
-            const canvas = document.createElement('canvas');
-            let width = img.width;
-            let height = img.height;
-
-            if (width > maxWidth) {
-              height *= maxWidth / width;
-              width = maxWidth;
-            }
-
-            canvas.width = Math.max(1, Math.round(width));
-            canvas.height = Math.max(1, Math.round(height));
-            const ctx = canvas.getContext('2d');
-            if (!ctx) throw new Error('Error de contexto');
-            ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = 'high';
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-            // JPEG es compatible al 100% con cualquier móvil, tablet (iOS/Android) y ordenador
-            return canvas.toDataURL('image/jpeg', quality);
-          };
-
-          try {
-            const attempts: [number, number][] = [
-              [960, 0.78],
-              [800, 0.68],
-              [640, 0.58],
-              [480, 0.48],
-              [360, 0.4],
-            ];
-            let result = tryEncode(960, 0.78);
-            for (const [w, q] of attempts) {
-              result = tryEncode(w, q);
-              if (result.length <= 350000) break;
-            }
-            resolve(result);
-          } catch (err) {
-            reject(err);
-          }
-        };
-        img.onerror = () => reject(new Error('Error de carga'));
+      reader.onload = async (event) => {
+        try {
+          const optimized = await compressImageSource(event.target?.result as string, profile);
+          resolve(optimized);
+        } catch (err) {
+          reject(err);
+        }
       };
       reader.onerror = () => reject(new Error('Error de lectura'));
     });
@@ -215,14 +382,97 @@ const Admin: React.FC = () => {
     setIsProcessingImage(true);
     setErrorBanner(null);
     const file = files[0];
+    const profile: CompressionProfile =
+      type === 'logo-img'
+        ? 'logo'
+        : type === 'hero-img'
+          ? 'hero'
+          : type === 'blog-img'
+            ? 'blog'
+            : 'product';
     try {
-      const optimizedBase64 = await compressImage(file);
+      const optimizedBase64 = await compressImage(file, profile);
+      const savedPct =
+        file.size > 0
+          ? Math.max(0, Math.round((1 - optimizedBase64.length / Math.max(file.size, 1)) * 100))
+          : 0;
+      setLastCompressionNote(
+        `Imagen optimizada: ${formatBytes(file.size)} → ${formatBytes(optimizedBase64.length)}${savedPct > 5 ? ` (-${savedPct}%)` : ''}`
+      );
       applyImageUpdate(optimizedBase64, targetId, type);
     } catch {
       setErrorBanner('No se pudo procesar la imagen seleccionada.');
     } finally {
       setIsProcessingImage(false);
       e.target.value = '';
+    }
+  };
+
+  const handleOptimizeExistingImages = async () => {
+    if (isOptimizingAll) return;
+    setIsOptimizingAll(true);
+    setErrorBanner(null);
+    try {
+      const current = latestConfigRef.current;
+      let optimizedCount = 0;
+      let bytesSaved = 0;
+
+      const tryShrink = async (
+        val: string,
+        threshold: number,
+        profile: CompressionProfile
+      ): Promise<string> => {
+        if (!val || !val.startsWith('data:image/') || val.length <= threshold) return val;
+        try {
+          const shrunk = await compressImageSource(val, profile);
+          if (shrunk.length < val.length * 0.92) {
+            optimizedCount++;
+            bytesSaved += val.length - shrunk.length;
+            return shrunk;
+          }
+        } catch {
+          // Mantener original si falla la decodificación
+        }
+        return val;
+      };
+
+      const nextLogo = await tryShrink(current.logoUrl, 85_000, 'logo');
+      const nextHero = await tryShrink(current.home.heroImage, 175_000, 'hero');
+      const nextAboutImg = await tryShrink(current.about.image, 135_000, 'product');
+
+      const nextProducts = await Promise.all(
+        current.products.map(async (p) => ({
+          ...p,
+          imageUrls: await Promise.all(
+            p.imageUrls.map((u) => tryShrink(u, 135_000, 'product'))
+          ),
+        }))
+      );
+
+      const nextBlog = await Promise.all(
+        current.blog.map(async (b) => ({
+          ...b,
+          imageUrl: await tryShrink(b.imageUrl, 135_000, 'blog'),
+        }))
+      );
+
+      if (optimizedCount > 0) {
+        updateConfig((prev) => ({
+          ...prev,
+          logoUrl: nextLogo,
+          home: { ...prev.home, heroImage: nextHero },
+          about: { ...prev.about, image: nextAboutImg },
+          products: nextProducts,
+          blog: nextBlog,
+        }));
+        setLastCompressionNote(
+          `Optimizadas ${optimizedCount} imágenes: has liberado ${formatBytes(bytesSaved)}. Pulsa "GUARDAR Y PUBLICAR" para aplicarlo en la nube.`
+        );
+      } else {
+        setLastCompressionNote('Todas tus imágenes ya están optimizadas al máximo.');
+      }
+    } finally {
+      setIsOptimizingAll(false);
     }
   };
 
@@ -384,13 +634,29 @@ const Admin: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 px-4 py-2 bg-tilo/30 border border-[#EBDCC5] rounded-sm text-[10px] font-bold uppercase tracking-wider text-[#4A3728]">
-          <Cloud size={14} className={isSyncedWithCloud ? 'text-green-700' : 'text-orange-600'} />
-          <span>
-            {cloudInitialized
-              ? `${config.products.length} piezas en la nube`
-              : 'Pendiente de publicación inicial'}
-          </span>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2 px-4 py-2 bg-tilo/30 border border-[#EBDCC5] rounded-sm text-[10px] font-bold uppercase tracking-wider text-[#4A3728]">
+            <Cloud size={14} className={isSyncedWithCloud ? 'text-green-700' : 'text-orange-600'} />
+            <span>
+              {cloudInitialized
+                ? `${config.products.length} piezas en la nube`
+                : 'Pendiente de publicación inicial'}
+            </span>
+          </div>
+          <div
+            className={`flex items-center gap-2 px-4 py-2 border rounded-sm text-[10px] font-bold uppercase tracking-wider ${
+              memoryStats.dbPct >= 85
+                ? 'bg-red-50 border-red-300 text-red-700'
+                : memoryStats.dbPct >= 65
+                  ? 'bg-amber-50 border-amber-300 text-amber-800'
+                  : 'bg-emerald-50/70 border-emerald-200 text-emerald-800'
+            }`}
+          >
+            <HardDrive size={14} />
+            <span>
+              {formatBytes(memoryStats.totalDbBytes)} / 1.024 MB ({memoryStats.dbPct.toFixed(1)}%)
+            </span>
+          </div>
         </div>
 
         <div className="flex items-center gap-4">
@@ -430,6 +696,114 @@ const Admin: React.FC = () => {
       </header>
 
       <div className="max-w-7xl mx-auto px-6 mt-8 space-y-4">
+        {/* Panel de Contador de Memoria y Capacidad en Firebase */}
+        <div className="bg-white border-2 border-[#EBDCC5] p-5 md:p-6 rounded-sm shadow-sm space-y-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-tilo/50 border border-[#EBDCC5] rounded-sm text-[#4A3728]">
+                <HardDrive size={20} />
+              </div>
+              <div>
+                <h2 className="text-xs font-black uppercase tracking-[0.2em] text-[#4A3728]">
+                  Contador de Memoria en Firebase (Plan Gratuito)
+                </h2>
+                <p className="text-[11px] text-gray-500">
+                  {memoryStats.totalDocsCount} documentos ({config.products.length} piezas ·{' '}
+                  {config.blog.length} artículos) · Capacidad libre aprox. para{' '}
+                  <strong className="text-[#4A3728]">
+                    ~{memoryStats.remainingEstimatedItems.toLocaleString('es-ES')} artículos similares más
+                  </strong>{' '}
+                  · ~{memoryStats.estimatedMonthlyVisits.toLocaleString('es-ES')} visitas/mes (límite 10 GB/mes)
+                </p>
+              </div>
+            </div>
+
+            {memoryStats.heavyImagesCount > 0 && (
+              <button
+                onClick={handleOptimizeExistingImages}
+                disabled={isOptimizingAll || isProcessingImage}
+                className="bg-orange-600 text-white px-4 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-sm hover:bg-orange-700 flex items-center gap-2 shrink-0 shadow-sm disabled:opacity-60"
+              >
+                {isOptimizingAll ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : (
+                  <Minimize2 size={14} />
+                )}
+                Comprimir {memoryStats.heavyImagesCount}{' '}
+                {memoryStats.heavyImagesCount === 1 ? 'imagen pesada' : 'imágenes pesadas'}
+              </button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider text-[#4A3728]">
+                <span>Base de datos total</span>
+                <span>
+                  {formatBytes(memoryStats.totalDbBytes)} / 1.024 MB ({memoryStats.dbPct.toFixed(2)}%)
+                </span>
+              </div>
+              <div className="w-full h-2.5 bg-gray-100 rounded-sm overflow-hidden border border-[#EBDCC5]">
+                <div
+                  className={`h-full transition-all duration-300 ${
+                    memoryStats.dbPct >= 85
+                      ? 'bg-red-600'
+                      : memoryStats.dbPct >= 65
+                        ? 'bg-amber-500'
+                        : 'bg-emerald-600'
+                  }`}
+                  style={{ width: `${Math.max(1.5, memoryStats.dbPct)}%` }}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider text-[#4A3728]">
+                <span>Portada + Logo + Sobre Mí (máx. 1 MB juntos)</span>
+                <span
+                  className={
+                    memoryStats.settingsPct >= 85
+                      ? 'text-red-700'
+                      : memoryStats.settingsPct >= 70
+                        ? 'text-amber-700'
+                        : 'text-[#4A3728]'
+                  }
+                >
+                  {formatBytes(memoryStats.settingsBytes)} / 950 KB (
+                  {memoryStats.settingsPct.toFixed(0)}%)
+                </span>
+              </div>
+              <div className="w-full h-2.5 bg-gray-100 rounded-sm overflow-hidden border border-[#EBDCC5]">
+                <div
+                  className={`h-full transition-all duration-300 ${
+                    memoryStats.settingsPct >= 85
+                      ? 'bg-red-600'
+                      : memoryStats.settingsPct >= 70
+                        ? 'bg-amber-500'
+                        : 'bg-emerald-600'
+                  }`}
+                  style={{ width: `${Math.max(1.5, memoryStats.settingsPct)}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {lastCompressionNote && (
+          <div className="bg-emerald-50 border border-emerald-300 px-4 py-3 rounded-sm flex items-center justify-between gap-4 text-emerald-900 text-xs font-medium">
+            <div className="flex items-center gap-2">
+              <Check size={16} className="text-emerald-700 shrink-0" />
+              <span>{lastCompressionNote}</span>
+            </div>
+            <button
+              onClick={() => setLastCompressionNote(null)}
+              className="p-1 hover:bg-emerald-100 rounded"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        )}
+
         {!cloudInitialized && (
           <div className="bg-orange-50 border-2 border-orange-400 p-5 rounded-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-start gap-3">
@@ -651,6 +1025,45 @@ const Admin: React.FC = () => {
                     </button>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                       <div className="space-y-6">
+                        {(() => {
+                          const prodBytes = memoryStats.productBytesMap[p.id] || 0;
+                          const prodPct = Math.min(100, (prodBytes / MAX_DOC_BYTES) * 100);
+                          return (
+                            <div className="p-3 bg-gray-50 border border-[#EBDCC5] rounded-sm space-y-1.5">
+                              <div className="flex justify-between text-[9px] font-black uppercase tracking-wider text-[#4A3728]">
+                                <span>Memoria pieza</span>
+                                <span
+                                  className={
+                                    prodPct >= 88
+                                      ? 'text-red-700'
+                                      : prodPct >= 70
+                                        ? 'text-amber-700'
+                                        : 'text-emerald-800'
+                                  }
+                                >
+                                  {formatBytes(prodBytes)} / 950 KB · {p.imageUrls.length}/10 fotos
+                                </span>
+                              </div>
+                              <div className="w-full h-1.5 bg-gray-200 rounded-sm overflow-hidden">
+                                <div
+                                  className={`h-full transition-all ${
+                                    prodPct >= 88
+                                      ? 'bg-red-600'
+                                      : prodPct >= 70
+                                        ? 'bg-amber-500'
+                                        : 'bg-emerald-600'
+                                  }`}
+                                  style={{ width: `${Math.max(2, prodPct)}%` }}
+                                />
+                              </div>
+                              {(prodPct >= 88 || p.imageUrls.length > 10) && (
+                                <p className="text-[9px] text-red-700 font-bold">
+                                  Cerca o por encima del límite de 1 MB por producto. Reduce fotos o usa URLs.
+                                </p>
+                              )}
+                            </div>
+                          );
+                        })()}
                         <label className={labelClass}>Fotografías</label>
                         <div className="grid grid-cols-2 gap-3 mb-4">
                           {p.imageUrls.map((url, idx) => (
@@ -1004,6 +1417,40 @@ const Admin: React.FC = () => {
                     >
                       <Trash2 size={24} />
                     </button>
+                    {(() => {
+                      const postBytes = memoryStats.blogBytesMap[post.id] || 0;
+                      const postPct = Math.min(100, (postBytes / MAX_DOC_BYTES) * 100);
+                      return (
+                        <div className="p-3 bg-gray-50 border border-[#EBDCC5] rounded-sm space-y-1.5 max-w-md">
+                          <div className="flex justify-between text-[9px] font-black uppercase tracking-wider text-[#4A3728]">
+                            <span>Memoria de este artículo</span>
+                            <span
+                              className={
+                                postPct >= 88
+                                  ? 'text-red-700'
+                                  : postPct >= 70
+                                    ? 'text-amber-700'
+                                    : 'text-emerald-800'
+                              }
+                            >
+                              {formatBytes(postBytes)} / 950 KB ({postPct.toFixed(0)}%)
+                            </span>
+                          </div>
+                          <div className="w-full h-1.5 bg-gray-200 rounded-sm overflow-hidden">
+                            <div
+                              className={`h-full transition-all ${
+                                postPct >= 88
+                                  ? 'bg-red-600'
+                                  : postPct >= 70
+                                    ? 'bg-amber-500'
+                                    : 'bg-emerald-600'
+                              }`}
+                              style={{ width: `${Math.max(2, postPct)}%` }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })()}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                       <div className="space-y-4">
                         <label className={labelClass}>Título</label>

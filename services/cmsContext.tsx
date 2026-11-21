@@ -423,28 +423,33 @@ export const CmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       });
 
       try {
-        const batch = writeBatch(db);
-        batch.set(doc(db, 'site_settings', 'main'), settingsPayload);
+        type BatchOp = (b: ReturnType<typeof writeBatch>) => void;
+        const ops: BatchOp[] = [];
+        ops.push((b) => b.set(doc(db, 'site_settings', 'main'), settingsPayload));
 
         for (const prod of preparedProducts) {
-          batch.set(doc(db, 'products', prod.id), prod);
+          ops.push((b) => b.set(doc(db, 'products', prod.id), prod));
         }
         for (const oldProdId of cloudProductIdsRef.current) {
           if (!seenProductIds.has(oldProdId)) {
-            batch.delete(doc(db, 'products', oldProdId));
+            ops.push((b) => b.delete(doc(db, 'products', oldProdId)));
           }
         }
 
         for (const post of preparedBlog) {
-          batch.set(doc(db, 'blog_posts', post.id), post);
+          ops.push((b) => b.set(doc(db, 'blog_posts', post.id), post));
         }
         for (const oldBlogId of cloudBlogIdsRef.current) {
           if (!seenBlogIds.has(oldBlogId)) {
-            batch.delete(doc(db, 'blog_posts', oldBlogId));
+            ops.push((b) => b.delete(doc(db, 'blog_posts', oldBlogId)));
           }
         }
 
-        await batch.commit();
+        for (let i = 0; i < ops.length; i += 400) {
+          const batch = writeBatch(db);
+          ops.slice(i, i + 400).forEach((applyOp) => applyOp(batch));
+          await batch.commit();
+        }
         const orderedNextConfig: SiteConfig = {
           ...nextConfig,
           products: sortedInputProducts,
